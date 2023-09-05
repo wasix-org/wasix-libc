@@ -61,8 +61,7 @@ progress.
 
 ## Usage
 
-The easiest way to get started with this is to use [wasi-sdk], which includes a
-build of WASI Libc in its sysroot.
+There is no official SDK like `wasi-sdk` for `wasix-libc`. However, there is an unofficial C/C++ sysroot build available at [wasix-sysroot](https://github.com/SanderVocke/wasix-sysroot).
 
 ## Building from source
 

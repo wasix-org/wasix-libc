@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <features.h>
+#include <__functions_memcpy.h>
 
 #define __NEED_struct_timespec
 #define __NEED_pid_t
@@ -81,9 +82,7 @@ int clone (int (*)(void *), void *, int, void *, ...);
 int unshare(int);
 int setns(int, int);
 
-void *memcpy(void *__restrict, const void *__restrict, size_t);
 int memcmp(const void *, const void *, size_t);
-void *memset (void *, int, size_t);
 void *calloc(size_t, size_t);
 void free(void *);
 

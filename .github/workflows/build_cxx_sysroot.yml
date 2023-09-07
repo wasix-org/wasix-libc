@@ -27,7 +27,7 @@ jobs:
       
       - name: Build
         run: |
-          TARGET_ARCH=wasm32 TARGET_OS=wasix make CC=clang AR=llvm-ar NM=llvm-nm THREAD_MODEL=posix || true
+          ./build32.sh
           rm -rf /opt/wasix-sysroot
           cp -r sysroot /opt/wasix-sysroot
           cp .github/workflows/files/clang-wasix.cmake_toolchain /opt/wasix-sysroot/clang-wasix.cmake_toolchain

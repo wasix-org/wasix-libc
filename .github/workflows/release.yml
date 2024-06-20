@@ -6,6 +6,10 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   build:
     uses: ./.github/workflows/build_cxx_sysroot.yml

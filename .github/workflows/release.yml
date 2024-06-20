@@ -7,7 +7,8 @@ on:
       - v*
 
 permissions:
-  contents: read
+  contents: write
+  packages: write
   checks: write
 
 jobs:
@@ -24,12 +25,14 @@ jobs:
           name: wasix-sysroot
           path: wasix-sysroot
 
-      - name: Publish
+      - name: Create published artifacts
         run: |
-          ls -alsh
-          ls wasix-sysroot -alsh
           mkdir publish
-          tar xcf publish/sysroot.tar.gz wasix-sysroot
-          ls -alsh
-          ls -alsh publish
-          echo so far, so good
+          tar -czf publish/sysroot.tar.gz wasix-sysroot
+
+      - name: Publish
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          draft: true
+          files: publish/*

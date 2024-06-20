@@ -1,7 +1,6 @@
 name: Release
 
 on:
-  pull_request:
   push:
     tags:
       - v*
@@ -35,4 +34,5 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           draft: true
+          automatic_release_tag: "${{ github.ref_name }}"
           files: publish/*

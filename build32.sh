@@ -12,8 +12,21 @@ cd ../../..
 # Build the extensions
 cargo run --manifest-path tools/wasix-headers/Cargo.toml generate-libc
 cp -f libc-bottom-half/headers/public/wasi/api.h libc-bottom-half/headers/public/wasi/api_wasix.h
-sed -i 's|__wasi__|__wasix__|g' libc-bottom-half/headers/public/wasi/api_wasix.h
-sed -i 's|__wasi_api_h|__wasix_api_h|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+
+OS=`uname -s`
+
+case $OS in
+  'Linux')
+    sed -i 's|__wasi__|__wasix__|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+    sed -i 's|__wasi_api_h|__wasix_api_h|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+    ;;
+  'Darwin') 
+    sed -i '' 's|__wasi__|__wasix__|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+    sed -i '' 's|__wasi_api_h|__wasix_api_h|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+    ;;
+  *) ;;
+esac
+
 cp -f libc-bottom-half/sources/__wasilibc_real.c libc-bottom-half/sources/__wasixlibc_real.c
 
 # Build WASI

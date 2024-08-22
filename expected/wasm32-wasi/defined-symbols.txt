@@ -538,6 +538,8 @@ __wasilibc_tls_align
 __wasilibc_tls_size
 __wasilibc_unlinkat
 __wasilibc_utimens
+__wasix_init
+__wasix_resume
 __wasm_call_dtors
 __wasm_signal
 __wcscoll_l

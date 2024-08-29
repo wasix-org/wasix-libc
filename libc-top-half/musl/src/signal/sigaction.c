@@ -177,7 +177,14 @@ volatile int __eintr_valid_flag;
 
 #ifdef __wasilibc_unmodified_upstream
 #else
+void __wasm_signal_impl(int sig);
+
+__attribute__((__weak__))
 void __wasm_signal(int sig) {
+	__wasm_signal_impl(sig);
+}
+
+void __wasm_signal_impl(int sig) {
 	if (sig-32U < 3 || sig-1U >= _NSIG-1) {
 		return;
 	}

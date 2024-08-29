@@ -540,6 +540,7 @@ __wasilibc_unlinkat
 __wasilibc_utimens
 __wasm_call_dtors
 __wasm_signal
+__wasm_signal_impl
 __wcscoll_l
 __wcsftime_l
 __wcsxfrm_l

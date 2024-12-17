@@ -59,6 +59,7 @@ replicate its build steps.
 
 # Usage
 
+### CMAKE based projects
 For building CMake projects, a toolchain file is included in the released sysroot
 at `wasix-sysroot/clang-wasm.cmake_toolchain`. In addition to specifying the 
 toolchain:
@@ -66,6 +67,29 @@ toolchain:
 * `wasm-ld` is needed for linking. It is usually available in your system's `LLVM`
   linker package. It should be in the `PATH`.
 * `CMAKE_TOOLCHAIN_FILE` and `CMAKE_SYSROOT` should both be set by you.
+
+For an example of a CMAKE based project being built for WASIX, please read the (notes)[https://github.com/wasix-org/llvm-project/blob/llvmorg-16.0.0-wasix/NOTES-WASIX.md] 
+on how to build LLVM/clang for WASIX.
+
+### Makefile based projects
+For building `Makefile` based projects, there are certain compiler and linker flags that
+need to be passed to as env vars:
+```
+CFLAGS="--target=wasm32-wasi --sysroot=$SYSROOT -matomics -mbulk-memory -mmutable-globals -pthread -mthread-model posix -ftls-model=local-exec \
+    -fno-trapping-math -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS \
+    -g -flto -O2"
+
+CXXFLAGS="--target=wasm32-wasi --sysroot=$SYSROOT -matomics -mbulk-memory -mmutable-globals -pthread -mthread-model posix -ftls-model=local-exec \
+    -fno-trapping-math -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_SIGNAL -D_WASI_EMULATED_PROCESS_CLOCKS \
+    -g -flto -fno-exceptions -O2"
+
+LDFLAGS="-Wl,--shared-memory -Wl,--max-memory=4294967296 -Wl,--import-memory -Wl,--export-dynamic \
+    -Wl,--export=__heap_base -Wl,--export=__stack_pointer -Wl,--export=__data_end -Wl,--export=__wasm_init_tls \
+    -Wl,--export=__wasm_signal -Wl,--export=__tls_size -Wl,--export=__tls_align -Wl,--export=__tls_base \
+    -lwasi-emulated-mman -flto -g -Wl,-z,stack-size=8388608 -Wl,--error-limit=0"
+```
+For an example of a Makefile based project being built for WASIX, please read the (notes)[https://github.com/wasix-org/openssl/blob/master/NOTES-WASIX.md] 
+on how to build OpenSSL for WASIX.
 
 The WASIX-specific tests and script in `test/wasix` can serve as examples for how
 to set this up.

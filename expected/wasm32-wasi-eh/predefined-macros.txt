@@ -6396,6 +6396,7 @@
 #define __WASI_WHENCE_CUR (UINT8_C(1))
 #define __WASI_WHENCE_END (UINT8_C(2))
 #define __WASI_WHENCE_SET (UINT8_C(0))
+#define __WASM_EXCEPTIONS__ 1
 #define __WCHAR_MAX__ 2147483647
 #define __WCHAR_TYPE__ int
 #define __WCHAR_WIDTH__ 32
@@ -6519,6 +6520,7 @@
 #define __wasm__ 1
 #define __wasm_atomics__ 1
 #define __wasm_bulk_memory__ 1
+#define __wasm_exception_handling__ 1
 #define __wasm_multivalue__ 1
 #define __wasm_reference_types__ 1
 #define _tolower(a) ((a)|0x20)

@@ -25,13 +25,13 @@ _Static_assert(_Alignof(int32_t) == 4, "non-wasi data layout");
 _Static_assert(_Alignof(uint32_t) == 4, "non-wasi data layout");
 _Static_assert(_Alignof(int64_t) == 8, "non-wasi data layout");
 _Static_assert(_Alignof(uint64_t) == 8, "non-wasi data layout");
-_Static_assert(_Alignof(intptr_t) == 4, "non-wasi data layout");
-_Static_assert(_Alignof(uintptr_t) == 4, "non-wasi data layout");
-_Static_assert(_Alignof(void*) == 4, "non-wasi data layout");
-typedef int32_t __wasi_int_t;
-typedef uint32_t __wasi_uint_t;
-_Static_assert(_Alignof(__wasi_int_t) == 4, "non-wasi data layout");
-_Static_assert(_Alignof(__wasi_uint_t) == 4, "non-wasi data layout");
+_Static_assert(_Alignof(intptr_t) == 8, "non-wasi data layout");
+_Static_assert(_Alignof(uintptr_t) == 8, "non-wasi data layout");
+_Static_assert(_Alignof(void*) == 8, "non-wasi data layout");
+typedef int64_t __wasi_int_t;
+typedef uint64_t __wasi_uint_t;
+_Static_assert(_Alignof(__wasi_int_t) == 8, "non-wasi data layout");
+_Static_assert(_Alignof(__wasi_uint_t) == 8, "non-wasi data layout");
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,8 +43,8 @@ extern "C" {
  */
 typedef __wasi_uint_t __wasi_pointersize_t;
 
-_Static_assert(sizeof(__wasi_pointersize_t) == 4, "witx calculated size");
-_Static_assert(_Alignof(__wasi_pointersize_t) == 4, "witx calculated align");
+_Static_assert(sizeof(__wasi_pointersize_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_pointersize_t) == 8, "witx calculated align");
 
 /**
  * Represents an ID of a waker to be woken
@@ -1005,10 +1005,10 @@ typedef struct __wasi_iovec_t {
 
 } __wasi_iovec_t;
 
-_Static_assert(sizeof(__wasi_iovec_t) == 8, "witx calculated size");
-_Static_assert(_Alignof(__wasi_iovec_t) == 4, "witx calculated align");
+_Static_assert(sizeof(__wasi_iovec_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_iovec_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_iovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 4, "witx calculated offset");
+_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 8, "witx calculated offset");
 
  */
 /**
@@ -1023,10 +1023,10 @@ typedef struct __wasi_ciovec_t {
 
 } __wasi_ciovec_t;
 
-_Static_assert(sizeof(__wasi_ciovec_t) == 8, "witx calculated size");
-_Static_assert(_Alignof(__wasi_ciovec_t) == 4, "witx calculated align");
+_Static_assert(sizeof(__wasi_ciovec_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_ciovec_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_ciovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 4, "witx calculated offset");
+_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 8, "witx calculated offset");
 
  */
 /**
@@ -3439,38 +3439,38 @@ typedef struct __wasi_thread_state_t {
 
 } __wasi_thread_state_t;
 
-_Static_assert(sizeof(__wasi_thread_state_t) == 112, "witx calculated size");
-_Static_assert(_Alignof(__wasi_thread_state_t) == 4, "witx calculated align");
+_Static_assert(sizeof(__wasi_thread_state_t) == 200, "witx calculated size");
+_Static_assert(_Alignof(__wasi_thread_state_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_thread_state_t, thread_self) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, dtv) == 4, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, thread_prev) == 8, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, thread_next) == 12, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, sysinfo) == 16, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, canary) == 20, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, tid) == 24, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, errno_val) == 28, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, detach_state) == 32, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, cancel) == 36, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, canceldisable) == 40, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, cancelasync) == 41, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, flags) == 42, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, map_base) == 44, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, map_size) == 48, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, stack) == 52, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, stack_size) == 56, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, guard_size) == 60, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, result) == 64, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, cancelbuf) == 68, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, tsd) == 72, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, robust_list_head) == 76, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, robust_list_off) == 80, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, robust_list_pending) == 84, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, h_errno_val) == 88, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, timer_id) == 92, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, locale) == 96, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, killlock) == 100, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, dlerror_buf) == 104, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_state_t, stdio_locks) == 108, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, dtv) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, thread_prev) == 16, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, thread_next) == 24, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, sysinfo) == 32, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, canary) == 40, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, tid) == 48, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, errno_val) == 52, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, detach_state) == 56, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, cancel) == 60, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, canceldisable) == 64, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, cancelasync) == 65, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, flags) == 66, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, map_base) == 72, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, map_size) == 80, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, stack) == 88, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, stack_size) == 96, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, guard_size) == 104, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, result) == 112, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, cancelbuf) == 120, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, tsd) == 128, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, robust_list_head) == 136, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, robust_list_off) == 144, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, robust_list_pending) == 152, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, h_errno_val) == 160, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, timer_id) == 164, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, locale) == 168, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, killlock) == 176, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, dlerror_buf) == 184, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_state_t, stdio_locks) == 192, "witx calculated offset");
 
 /**
  * thread start type
@@ -3531,24 +3531,24 @@ typedef struct __wasi_thread_start_t {
 
 } __wasi_thread_start_t;
 
-_Static_assert(sizeof(__wasi_thread_start_t) == 64, "witx calculated size");
-_Static_assert(_Alignof(__wasi_thread_start_t) == 4, "witx calculated align");
+_Static_assert(sizeof(__wasi_thread_start_t) == 128, "witx calculated size");
+_Static_assert(_Alignof(__wasi_thread_start_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_thread_start_t, stack) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, tls_base) == 4, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, start_funct) == 8, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, start_args) == 12, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved0) == 16, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved1) == 20, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved2) == 24, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved3) == 28, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved4) == 32, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved5) == 36, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved6) == 40, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved7) == 44, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved8) == 48, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, reserved9) == 52, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, stack_size) == 56, "witx calculated offset");
-_Static_assert(offsetof(__wasi_thread_start_t, guard_size) == 60, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, tls_base) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, start_funct) == 16, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, start_args) == 24, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved0) == 32, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved1) == 40, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved2) == 48, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved3) == 56, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved4) == 64, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved5) == 72, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved6) == 80, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved7) == 88, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved8) == 96, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, reserved9) == 104, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, stack_size) == 112, "witx calculated offset");
+_Static_assert(offsetof(__wasi_thread_start_t, guard_size) == 120, "witx calculated offset");
 
 /**
  * epoll type.
@@ -3623,8 +3623,8 @@ typedef struct __wasi_epoll_data_t {
 _Static_assert(sizeof(__wasi_epoll_data_t) == 24, "witx calculated size");
 _Static_assert(_Alignof(__wasi_epoll_data_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_epoll_data_t, ptr) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_epoll_data_t, fd) == 4, "witx calculated offset");
-_Static_assert(offsetof(__wasi_epoll_data_t, data1) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_epoll_data_t, fd) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_epoll_data_t, data1) == 12, "witx calculated offset");
 _Static_assert(offsetof(__wasi_epoll_data_t, data2) == 16, "witx calculated offset");
 
 /**
@@ -3710,22 +3710,22 @@ typedef struct __wasi_proc_spawn_fd_op_t {
 
 } __wasi_proc_spawn_fd_op_t;
 
-_Static_assert(sizeof(__wasi_proc_spawn_fd_op_t) == 56, "witx calculated size");
+_Static_assert(sizeof(__wasi_proc_spawn_fd_op_t) == 64, "witx calculated size");
 _Static_assert(_Alignof(__wasi_proc_spawn_fd_op_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, cmd) == 0, "witx calculated offset");
 _Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fd) == 4, "witx calculated offset");
 _Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, src_fd) == 8, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, path) == 12, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, path_len) == 16, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, dirflags) == 20, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, oflags) == 24, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fs_rights_base) == 32, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fs_rights_inheriting) == 40, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflags) == 48, "witx calculated offset");
-_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflagsext) == 50, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, path) == 16, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, path_len) == 24, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, dirflags) == 32, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, oflags) == 36, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fs_rights_base) == 40, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fs_rights_inheriting) == 48, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflags) == 56, "witx calculated offset");
+_Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflagsext) == 58, "witx calculated offset");
 
 /**
- * @defgroup wasix_32v1
+ * @defgroup wasix_64v1
  * @{
  */
 

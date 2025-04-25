@@ -14,8 +14,14 @@
 #define IFTODT(x) (__wasilibc_iftodt(x))
 #define DTTOIF(x) (__wasilibc_dttoif(x))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int __wasilibc_iftodt(int x);
 int __wasilibc_dttoif(int x);
+#ifdef __cplusplus
+}
+#endif
 
 #include <__struct_dirent.h>
 #include <__typedef_DIR.h>

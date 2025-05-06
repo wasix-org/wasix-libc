@@ -1095,3 +1095,51 @@ __wasi_errno_t __wasi_epoll_wait(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_dlopen(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("dlopen")
+));
+
+__wasi_errno_t __wasi_dlopen(
+    const char *path,
+    __wasi_dl_flags_t flags,
+    uint8_t * err_buf,
+    __wasi_size_t err_buf_len,
+    __wasi_dl_handle_t *retptr0
+){
+    size_t path_len = strlen(path);
+    int32_t ret = __imported_wasix_32v1_dlopen((intptr_t) path, (intptr_t) path_len, flags, (int32_t) err_buf, (int32_t) err_buf_len, (intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_dlclose(int32_t arg0, int32_t arg1, int32_t arg2) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("dlclose")
+));
+
+__wasi_errno_t __wasi_dlclose(
+    __wasi_dl_handle_t handle,
+    uint8_t * err_buf,
+    __wasi_size_t err_buf_len
+){
+    int32_t ret = __imported_wasix_32v1_dlclose((int32_t) handle, (int32_t) err_buf, (int32_t) err_buf_len);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_dlsym(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("dlsym")
+));
+
+__wasi_errno_t __wasi_dlsym(
+    __wasi_dl_handle_t handle,
+    const char *symbol,
+    uint8_t * err_buf,
+    __wasi_size_t err_buf_len,
+    __wasi_size_t *retptr0
+){
+    size_t symbol_len = strlen(symbol);
+    int32_t ret = __imported_wasix_32v1_dlsym((int32_t) handle, (intptr_t) symbol, (intptr_t) symbol_len, (int32_t) err_buf, (int32_t) err_buf_len, (intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+

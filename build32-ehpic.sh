@@ -23,14 +23,15 @@ cat > libc-bottom-half/headers/public/wasi/api.h<<EOF
 #include "api_poly.h"
 EOF
 
-make PIC=yes -j 14
+make PIC=yes -j 14 -f Makefile-eh
 rm -f sysroot/lib/wasm32-wasi/libc-printscan-long-double.a
 
 # Build C++ sysroot
 mkdir -p build/libcxx
 cd build/libcxx
 cmake \
-    -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../../tools/clang-wasix.cmake_toolchain \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../../tools/clang-wasix-eh.cmake_toolchain \
     -DCMAKE_SYSROOT=$(pwd)/../../sysroot \
     -DCMAKE_INSTALL_PREFIX=$(pwd)/../../sysroot \
     -DCXX_SUPPORTS_CXX23=ON \
@@ -61,11 +62,11 @@ cmake \
     -DCMAKE_CXX_COMPILER_WORKS=ON \
     -DLLVM_COMPILER_CHECKED=ON \
     -DUNIX:BOOL=ON \
-    -DLIBCXX_LIBDIR_SUFFIX=/wasm32-wasix \
-    -DLIBCXXABI_LIBDIR_SUFFIX=/wasm32-wasix \
+    -DLIBCXX_LIBDIR_SUFFIX=/wasm32-wasi \
+    -DLIBCXXABI_LIBDIR_SUFFIX=/wasm32-wasi \
     -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
     ../../tools/llvm-project/runtimes
 cmake --build . --target install --parallel 16
 cd ../..
 
-rsync -Lrtv --delete ./sysroot/ ./sysroot32-pic/
+rsync -Lrtv --delete ./sysroot/ ./sysroot32-ehpic/

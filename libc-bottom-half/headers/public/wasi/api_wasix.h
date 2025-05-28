@@ -4946,6 +4946,13 @@ __wasi_errno_t __wasi_epoll_wait(
     __wasi_size_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**
+ * Close a dynamically-linked module.
+ * 
+ */
+__wasi_errno_t __wasi_dl_invalid_handle(
+    __wasi_dl_handle_t handle
+) __attribute__((__warn_unused_result__));
+/**
  * Open a dynamically-linked module.
  * 
  */
@@ -4955,15 +4962,6 @@ __wasi_errno_t __wasi_dlopen(
     uint8_t * err_buf,
     __wasi_size_t err_buf_len,
     __wasi_dl_handle_t *retptr0
-) __attribute__((__warn_unused_result__));
-/**
- * Close a dynamically-linked module.
- * 
- */
-__wasi_errno_t __wasi_dlclose(
-    __wasi_dl_handle_t handle,
-    uint8_t * err_buf,
-    __wasi_size_t err_buf_len
 ) __attribute__((__warn_unused_result__));
 /**
  * Load a symbol from a dynamically-linked module.

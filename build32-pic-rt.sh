@@ -5,6 +5,7 @@
 mkdir -p build/compiler-rt
 cd build/compiler-rt
 cmake \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_SYSTEM_NAME=WASI \
     -DCMAKE_SYSTEM_VERSION=1 \
     -DCMAKE_SYSTEM_PROCESSOR=wasm32 \

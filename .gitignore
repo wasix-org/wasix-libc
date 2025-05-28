@@ -2,6 +2,7 @@
 sysroot
 sysroot32
 sysroot32-eh
+sysroot32-ehpic
 sysroot32-pic
 sysroot64
 build

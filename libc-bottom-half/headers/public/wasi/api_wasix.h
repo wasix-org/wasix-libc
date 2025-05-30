@@ -4961,6 +4961,7 @@ __wasi_errno_t __wasi_dlopen(
     __wasi_dl_flags_t flags,
     uint8_t * err_buf,
     __wasi_size_t err_buf_len,
+    const char *ld_library_path,
     __wasi_dl_handle_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**

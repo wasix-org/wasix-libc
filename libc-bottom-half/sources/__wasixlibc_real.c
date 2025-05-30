@@ -1107,7 +1107,7 @@ __wasi_errno_t __wasi_dl_invalid_handle(
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_dlopen(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5) __attribute__((
+int32_t __imported_wasix_32v1_dlopen(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("dlopen")
 ));
@@ -1117,10 +1117,12 @@ __wasi_errno_t __wasi_dlopen(
     __wasi_dl_flags_t flags,
     uint8_t * err_buf,
     __wasi_size_t err_buf_len,
+    const char *ld_library_path,
     __wasi_dl_handle_t *retptr0
 ){
     size_t path_len = strlen(path);
-    int32_t ret = __imported_wasix_32v1_dlopen((intptr_t) path, (intptr_t) path_len, flags, (int32_t) err_buf, (int32_t) err_buf_len, (intptr_t) retptr0);
+    size_t ld_library_path_len = strlen(ld_library_path);
+    int32_t ret = __imported_wasix_32v1_dlopen((intptr_t) path, (intptr_t) path_len, flags, (int32_t) err_buf, (int32_t) err_buf_len, (intptr_t) ld_library_path, (intptr_t) ld_library_path_len, (intptr_t) retptr0);
     return (uint16_t) ret;
 }
 

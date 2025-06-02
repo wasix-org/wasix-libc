@@ -17,7 +17,7 @@ static int __pthread_timedjoin_np(pthread_t t, void **res, const struct timespec
 	__pthread_testcancel();
 	__pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cs);
 	if (cs == PTHREAD_CANCEL_ENABLE) __pthread_setcancelstate(cs, 0);
-	while ((state = t->detach_state) && r != ETIMEDOUT && r != EINVAL) {
+	while (((state = t->detach_state) != DT_EXITED) && r != ETIMEDOUT && r != EINVAL) {
 		if (state >= DT_DETACHED) a_crash();
 		r = __timedwait_cp(&t->detach_state, state, CLOCK_REALTIME, at, 1);
 	}

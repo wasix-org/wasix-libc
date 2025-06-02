@@ -126,15 +126,9 @@ static struct builtin_tls
 #define MIN_TLS_ALIGN offsetof(struct builtin_tls, pt)
 
 static struct tls_module main_tls;
-#endif
-
-#ifndef __wasilibc_unmodified_upstream
-extern void __wasm_init_tls(void *);
-#endif
 
 void *__copy_tls(unsigned char *mem)
 {
-#ifdef __wasilibc_unmodified_upstream
 	pthread_t td;
 	struct tls_module *p;
 	size_t i;
@@ -168,19 +162,9 @@ void *__copy_tls(unsigned char *mem)
 	dtv[0] = libc.tls_cnt;
 	td->dtv = dtv;
 	return td;
-#else
-	size_t tls_align = __builtin_wasm_tls_align();
-	volatile void *tls_base = __builtin_wasm_tls_base();
-	mem += tls_align;
-	mem -= (uintptr_t)mem & (tls_align - 1);
-	__wasm_init_tls(mem);
-	__asm__("local.get %0\n"
-			"global.set __tls_base\n" ::"r"(tls_base));
-	return mem;
-#endif
+
 }
 
-#ifdef __wasilibc_unmodified_upstream
 #if ULONG_MAX == 0xffffffff
 typedef Elf32_Phdr Phdr;
 #else

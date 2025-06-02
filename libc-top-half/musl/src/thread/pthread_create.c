@@ -290,6 +290,10 @@ static int start_c11(void *p)
 void wasi_thread_start(int tid, void *p);
 hidden void *__dummy_reference = wasi_thread_start;
 
+#ifndef __wasilibc_unmodified_upstream
+__attribute__((__weak__)) extern void __wasm_init_tls(void *);
+#endif
+
 hidden void __wasi_thread_start_C(int tid, void *p)
 {
 	struct start_args *args = p;
@@ -299,6 +303,12 @@ hidden void __wasi_thread_start_C(int tid, void *p)
 	// whichever thread (parent or child) reaches this point first can proceed
 	// without waiting.
 	atomic_store((atomic_int *) &(self->tid), tid);
+	// Initialize the tls storage area for the thread.
+	if (__wasm_init_tls){
+		volatile void* tls_base = __builtin_wasm_tls_base();
+		__wasm_init_tls((void*)tls_base);
+	}
+
 	// Execute the user's start function.
 	__pthread_exit(args->start_func(args->start_arg));
 }
@@ -455,7 +465,11 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 #ifdef __wasilibc_unmodified_upstream
 	new = __copy_tls(tsd - libc.tls_size);
 #else
-	new_tls_base = __copy_tls(tsd - tls_size);
+	// Previously this called __copy_tls, which internally called __wasm_init_tls.
+	// Now we initialize the TLS in __wasi_thread_start_C
+	new_tls_base = tsd - tls_size;
+	new_tls_base += tls_align;
+	new_tls_base -= (uintptr_t)new_tls_base & (tls_align - 1);
 	tls_offset = new_tls_base - tls_base;
 	new = (void*)((uintptr_t)self + tls_offset);
 #endif

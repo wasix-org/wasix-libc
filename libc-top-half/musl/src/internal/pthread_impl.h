@@ -77,9 +77,14 @@ struct pthread {
 };
 
 enum {
-	DT_EXITED = 0,
+	// A value of this type will be awaited in pthread_join.
+	// As the pthread struct will be reset to 0 for a short moment
+	// when the thread is started, the joinable variant needs to be
+	// 0, because otherwise the thread would be considered detached or exited.
+	// TODO: Write better comment.
+	DT_JOINABLE = 0,
+	DT_EXITED,
 	DT_EXITING,
-	DT_JOINABLE,
 	DT_DETACHED,
 };
 

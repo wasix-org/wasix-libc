@@ -286,6 +286,26 @@ static int start_c11(void *p)
  */
 extern void __wasm_init_tls(void *);
 
+hidden void __attribute ((noinline)) __wasi_thread_start_C(int tid, struct start_args *args)
+{
+	// Initialize the tls storage area for the thread without destoying the
+	// current thread's pthread struct.
+	char backup[sizeof(struct pthread)];
+	memcpy(backup, __pthread_self(), sizeof(struct pthread));
+	__wasm_init_tls(args->tls_base);
+	memcpy(__pthread_self(), backup, sizeof(struct pthread));
+
+	// Set the thread ID (TID) on the pthread structure. The TID is stored
+	// atomically since it is also stored by the parent thread; this way,
+	// whichever thread (parent or child) reaches this point first can proceed
+	// without waiting.
+	pthread_t self = __pthread_self();
+	atomic_store((atomic_int *) &(self->tid), tid);
+
+	// Execute the user's start function.
+	__pthread_exit(args->start_func(args->start_arg));
+}
+
 hidden void wasi_thread_start(int tid, struct start_args *args)
 {
 #if defined(__wasm64__)
@@ -298,18 +318,7 @@ hidden void wasi_thread_start(int tid, struct start_args *args)
 	        "global.set __stack_pointer" :: "r" (args->stack));
 #endif
 
-	__wasm_init_tls(args->tls_base);
-
-	pthread_t self = __pthread_self();
-	// Set the thread ID (TID) on the pthread structure. The TID is stored
-	// atomically since it is also stored by the parent thread; this way,
-	// whichever thread (parent or child) reaches this point first can proceed
-	// without waiting.
-	atomic_store((atomic_int *) &(self->tid), tid);
-	// Initialize the tls storage area for the thread.
-
-	// Execute the user's start function.
-	__pthread_exit(args->start_func(args->start_arg));
+	__wasi_thread_start_C(tid, args);
 }
 
 /*

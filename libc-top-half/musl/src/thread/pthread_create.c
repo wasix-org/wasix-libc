@@ -311,18 +311,10 @@ static int start_c11(void *p)
 }
 #else
 
-/*
- * We want to ensure wasi_thread_start is linked whenever
- * pthread_create is used. The following reference is to ensure that.
- * Otherwise, the linker doesn't notice the dependency because
- * wasi_thread_start is used indirectly via a wasm export.
- */
-void wasi_thread_start(int tid, void *p);
-hidden void *__dummy_reference = wasi_thread_start;
-
 extern void __set_tp(uintptr_t p);
+extern void __wasm_init_tls(void* tls_base);
 
-hidden void __wasi_thread_start_C(int tid, void *p)
+hidden void __attribute__ ((noinline)) __wasi_thread_start_C(int tid, void *p)
 {
 	struct start_args *args = p;
 
@@ -337,6 +329,31 @@ hidden void __wasi_thread_start_C(int tid, void *p)
 	// Execute the user's start function.
 	__pthread_exit(args->start_func(args->start_arg));
 }
+
+hidden void wasi_thread_start(int tid, struct start_args *args)
+{
+#if defined(__wasm64__)
+	__asm__(".globaltype __stack_pointer, i64\n"
+	        "local.get %0\n"
+	        "global.set __stack_pointer" :: "r" (args->stack));
+#else
+	__asm__(".globaltype __stack_pointer, i32\n"
+	        "local.get %0\n"
+	        "global.set __stack_pointer" :: "r" (args->stack));
+#endif
+
+	__wasm_init_tls(args->tls_base);
+	
+	__wasi_thread_start_C(tid, args);
+}
+/*
+ * We want to ensure wasi_thread_start is linked whenever
+ * pthread_create is used. The following reference is to ensure that.
+ * Otherwise, the linker doesn't notice the dependency because
+ * wasi_thread_start is used indirectly via a wasm export.
+ */
+hidden void *__dummy_reference = wasi_thread_start;
+
 #endif
 
 #ifdef __wasilibc_unmodified_upstream

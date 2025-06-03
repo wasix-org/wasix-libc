@@ -30,6 +30,7 @@ rm -f sysroot/lib/wasm32-wasi/libc-printscan-long-double.a
 mkdir -p build/libcxx
 cd build/libcxx
 cmake \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
     -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../../tools/clang-wasix.cmake_toolchain \
     -DCMAKE_SYSROOT=$(pwd)/../../sysroot \
     -DCMAKE_INSTALL_PREFIX=$(pwd)/../../sysroot \

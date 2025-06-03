@@ -333,7 +333,6 @@ LIBC_TOP_HALF_MUSL_SOURCES += \
         thread/sem_timedwait.c \
         thread/sem_trywait.c \
         thread/sem_wait.c \
-        thread/$(TARGET_ARCH)/wasi_thread_start.s \
     )
 endif
 

@@ -28,7 +28,11 @@ static int __pthread_timedjoin_np(pthread_t t, void **res, const struct timespec
 #ifdef __wasilibc_unmodified_upstream
 	if (t->map_base) __munmap(t->map_base, t->map_size);
 #else
-	if (t->map_base) free(t->map_base);
+	if (t->map_base) {
+		free(t->map_base);
+		// Free t itself, because it is not in the tls area anymore
+		free(t->self);
+	}
 #endif
 	return 0;
 }

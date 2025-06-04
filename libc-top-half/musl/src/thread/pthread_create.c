@@ -192,6 +192,8 @@ _Noreturn void __pthread_exit(void *result)
 		// do it manually here
 		__tl_unlock();
 		free(self->map_base);
+		// Self needs to be manually freed, because it is not in the tls area
+		free(self->self);
 		for (;;) __wasi_thread_exit(0);
 	}
 #endif
@@ -634,6 +636,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 		if (map) __munmap(map, size);
 #else
 		free(map);
+		free(new);
 #endif
 		return -ret;
 	}

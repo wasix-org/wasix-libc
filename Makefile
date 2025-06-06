@@ -24,6 +24,8 @@ BUILD_LIBSETJMP ?= yes
 OBJDIR ?= build/$(TARGET_TRIPLE)
 # Whether to compile with PIC (needed for shared libs and dynamic linking)
 PIC ?= no
+# Whether to enable C++ exception handling support
+EXCEPTIONS ?= no
 
 # When the length is no larger than this threshold, we consider the
 # overhead of bulk memory opcodes to outweigh the performance benefit,
@@ -200,11 +202,6 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
         linux/epoll.c \
         linux/eventfd.c \
         linux/setgroups.c \
-        ldso/dlclose.c \
-        ldso/dlerror.c \
-        ldso/dlinfo.c \
-        ldso/dlopen.c \
-        ldso/dlsym.c \
         stat/futimesat.c \
         legacy/getpagesize.c \
         thread/thrd_sleep.c \
@@ -252,6 +249,17 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
                  %/cimagf.c %/cimag.c %cimagl.c, \
                  $(wildcard $(LIBC_TOP_HALF_MUSL_SRC_DIR)/complex/*.c)) \
     $(wildcard $(LIBC_TOP_HALF_MUSL_SRC_DIR)/crypt/*.c)
+
+ifneq ($(PIC), no)
+LIBC_TOP_HALF_MUSL_SOURCES += \
+    $(addprefix $(LIBC_TOP_HALF_MUSL_SRC_DIR)/, \
+        ldso/dlclose.c \
+        ldso/dlerror.c \
+        ldso/dlinfo.c \
+        ldso/dlopen.c \
+        ldso/dlsym.c \
+    )
+endif
 
 ifeq ($(THREAD_MODEL), posix)
 LIBC_TOP_HALF_MUSL_SOURCES += \
@@ -361,7 +369,8 @@ CFLAGS += --target=$(TARGET_TRIPLE)
 ASMFLAGS += --target=$(TARGET_TRIPLE)
 # WebAssembly floating-point match doesn't trap.
 # TODO: Add -fno-signaling-nans when the compiler supports it.
-CFLAGS += -fno-trapping-math -fwasm-exceptions
+CFLAGS += -fno-trapping-math
+
 # Add all warnings, but disable a few which occur in third-party code.
 CFLAGS += -Wall -Wextra -Werror \
   -Wno-incompatible-function-pointer-types \
@@ -384,7 +393,11 @@ endif
 ifeq ($(THREAD_MODEL), posix)
 # Specify the tls-model until LLVM 15 is released (which should contain
 # https://reviews.llvm.org/D130053).
-CFLAGS += -mthread-model posix -pthread -ftls-model=local-exec -mexception-handling -fwasm-exceptions -Wl,-mllvm,--wasm-enable-sjlj
+CFLAGS += -mthread-model posix -pthread -ftls-model=local-exec
+# Enable exception handling if requested
+ifeq ($(EXCEPTIONS),yes)
+CFLAGS += -mexception-handling -fwasm-exceptions -Wl,-mllvm,--wasm-enable-sjlj
+endif
 
 # Include cloudlib's directory to access the structure definition of clockid_t
 CFLAGS += -I$(LIBC_BOTTOM_HALF_CLOUDLIBC_SRC)
@@ -517,6 +530,10 @@ MUSL_OMIT_HEADERS += \
     "sys/sysmacros.h" \
     "aio.h"
 
+ifeq ($(PIC), no)
+MUSL_OMIT_HEADERS += "dlfcn.h"
+endif
+
 ifeq ($(THREAD_MODEL), single)
 # Remove headers not supported in single-threaded mode.
 MUSL_OMIT_HEADERS += "pthread.h"
@@ -542,7 +559,6 @@ ifeq ($(TARGET_TRIPLE), wasm32-wasi)
 endif
 
 	rm -f sysroot/lib/wasm32-wasi/libc-printscan-log-double.a
-# sh -c 'rm -rf ./sysroot32/ && mkdir -p ./sysroot32/ && cp -r --preserve=timestamps ./sysroot/. ./sysroot32/' || true
 
 $(SYSROOT_LIB)/libc.a: $(LIBC_OBJS)
 
@@ -555,6 +571,10 @@ $(SYSROOT_LIB)/libwasi-emulated-mman.a: $(LIBWASI_EMULATED_MMAN_OBJS)
 $(SYSROOT_LIB)/libwasi-emulated-process-clocks.a: $(LIBWASI_EMULATED_PROCESS_CLOCKS_OBJS)
 
 $(SYSROOT_LIB)/libwasi-emulated-getpid.a: $(LIBWASI_EMULATED_GETPID_OBJS)
+
+ifeq ($(EXCEPTIONS),no)
+$(SYSROOT_LIB)/libsetjmp.a: $(LIBSETJMP_OBJS)
+endif
 
 $(SYSROOT_LIB)/libcommon-tag-stubs.a: libcommon-tag-stubs.a
 	mkdir -p "$(SYSROOT_LIB)"

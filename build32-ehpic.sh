@@ -23,7 +23,7 @@ cat > libc-bottom-half/headers/public/wasi/api.h<<EOF
 #include "api_poly.h"
 EOF
 
-make PIC=yes -j 14 -f Makefile-eh
+make PIC=yes EXCEPTIONS=yes -j 14 -f Makefile
 rm -f sysroot/lib/wasm32-wasi/libc-printscan-long-double.a
 
 # Build C++ sysroot

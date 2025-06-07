@@ -150,7 +150,7 @@ static void pad(FILE *f, char c, int w, int l, int fl)
 	out(f, pad, l);
 }
 
-static const char xdigits[16] = {
+static const char xdigits[16] __attribute__((nonstring)) = {
 	"0123456789ABCDEF"
 };
 

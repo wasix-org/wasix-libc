@@ -258,7 +258,7 @@ static int name_from_dns_search(struct address buf[static MAXADDRS], char canon[
 #endif
 
 static const struct policy {
-	unsigned char addr[16];
+	unsigned char addr[16] __attribute__((nonstring));
 	unsigned char len, mask;
 	unsigned char prec, label;
 } defpolicy[] = {

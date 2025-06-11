@@ -35,7 +35,7 @@ cmake \
     -DCOMPILER_RT_HAS_FUNWIND_TABLES_FLAG=OFF \
     -DCMAKE_C_COMPILER_TARGET=wasm32-wasix \
     -DCOMPILER_RT_OS_DIR=wasix \
-    -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../../tools/clang-wasix.cmake_toolchain \
+    -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../../tools/clang-wasix-eh.cmake_toolchain \
     -DCMAKE_SYSROOT=$(pwd)/../../sysroot \
     -DCMAKE_INSTALL_PREFIX=$(pwd)/../../sysroot \
     -DCXX_SUPPORTS_CXX23=ON \

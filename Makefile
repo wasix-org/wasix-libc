@@ -673,6 +673,12 @@ include_dirs:
 	# Remove selected header files.
 	$(RM) $(patsubst %,$(SYSROOT_INC)/%,$(MUSL_OMIT_HEADERS))
 
+	find $(SYSROOT_INC) -wholename '*.h' -exec sed -i '1i\
+	#ifndef __wasix__\
+	#define __wasix__ 1\
+	#endif\
+	' {} +
+
 startup_files: include_dirs $(LIBC_BOTTOM_HALF_CRT_OBJS)
 	#
 	# Install the startup files (crt1.o etc).

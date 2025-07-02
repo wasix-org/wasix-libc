@@ -4,7 +4,6 @@
 
 // The user's `main` function, expecting arguments.
 // TODO: Port docs from upstream https://github.com/WebAssembly/wasi-libc/blob/main/libc-bottom-half/sources/__main_void.c
-__attribute__((__weak__))
 int __main_argc_argv(int argc, char *argv[]);
 
 // If the user's `main` function expects arguments, the compiler will rename

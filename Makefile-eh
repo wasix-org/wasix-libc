@@ -8,7 +8,7 @@ NM ?= $(patsubst %clang,%llvm-nm,$(filter-out ccache sccache,$(CC)))
 ifeq ($(origin AR), default)
 AR = $(patsubst %clang,%llvm-ar,$(filter-out ccache sccache,$(CC)))
 endif
-EXTRA_CFLAGS ?= -O2 -DNDEBUG -ftls-model=local-exec -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_PROCESS_CLOCKS 
+EXTRA_CFLAGS ?= -O2 -DNDEBUG -ftls-model=global-dynamic -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_PROCESS_CLOCKS 
 # The directory where we build the sysroot.
 SYSROOT ?= $(CURDIR)/sysroot
 # A directory to install to for "make install".
@@ -381,7 +381,9 @@ CFLAGS += -Wall -Wextra -Werror \
  -Wno-ignored-pragmas \
  -Wno-unused-but-set-variable \
  -Wno-unknown-warning-option \
- -Wno-unused-command-line-argument
+ -Wno-unused-command-line-argument \
+ -Wno-unknown-attributes
+
 
 # Configure support for threads.
 ifeq ($(THREAD_MODEL), single)
@@ -390,7 +392,7 @@ endif
 ifeq ($(THREAD_MODEL), posix)
 # Specify the tls-model until LLVM 15 is released (which should contain
 # https://reviews.llvm.org/D130053).
-CFLAGS += -mthread-model posix -pthread -ftls-model=local-exec -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
+CFLAGS += -mthread-model posix -pthread -ftls-model=global-dynamic -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
 
 # Include cloudlib's directory to access the structure definition of clockid_t
 CFLAGS += -I$(LIBC_BOTTOM_HALF_CLOUDLIBC_SRC)
@@ -684,7 +686,8 @@ libc: include_dirs \
     $(SYSROOT_LIB)/libwasi-emulated-mman.a \
     $(SYSROOT_LIB)/libwasi-emulated-process-clocks.a \
     $(SYSROOT_LIB)/libwasi-emulated-getpid.a \
-    $(SYSROOT_LIB)/libcommon-tag-stubs.a
+    $(SYSROOT_LIB)/libcommon-tag-stubs.a \
+    $(SYSROOT_LIB)/libsetjmp.a
 
 finish: startup_files libc
 	#

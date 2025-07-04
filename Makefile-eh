@@ -341,7 +341,6 @@ LIBC_TOP_HALF_MUSL_SOURCES += \
         thread/sem_timedwait.c \
         thread/sem_trywait.c \
         thread/sem_wait.c \
-        thread/$(TARGET_ARCH)/wasi_thread_start.s \
     )
 endif
 
@@ -486,7 +485,6 @@ MUSL_OMIT_HEADERS += \
     "bits/shm.h" "bits/msg.h" "bits/ipc.h" "bits/ptrace.h" \
     "bits/statfs.h" \
     "sys/vfs.h" \
-    "sys/statvfs.h" \
     "sys/syslog.h" \
     "ucontext.h" "sys/ucontext.h" \
     "utmp.h" "utmpx.h" \
@@ -666,6 +664,12 @@ include_dirs:
 
 	# Remove selected header files.
 	$(RM) $(patsubst %,$(SYSROOT_INC)/%,$(MUSL_OMIT_HEADERS))
+
+	find $(SYSROOT_INC) -wholename '*.h' -exec sed -i '1i\
+	#ifndef __wasix__\
+	#define __wasix__ 1\
+	#endif\
+	' {} +
 
 startup_files: include_dirs $(LIBC_BOTTOM_HALF_CRT_OBJS)
 	#

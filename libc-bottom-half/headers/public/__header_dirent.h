@@ -9,13 +9,14 @@
 #define DT_FIFO __WASI_FILETYPE_SOCKET_STREAM
 #define DT_LNK __WASI_FILETYPE_SYMBOLIC_LINK
 #define DT_REG __WASI_FILETYPE_REGULAR_FILE
+// Since WASI(X) has more than one socket filetype, we need to use a different
+// value for DT_SOCK. The value 255 is chosen to avoid conflicts with the
+// values of __WASI_FILETYPE_*.
+#define DT_SOCK (UINT8_C(255))
 #define DT_UNKNOWN __WASI_FILETYPE_UNKNOWN
 
 #define IFTODT(x) (__wasilibc_iftodt(x))
 #define DTTOIF(x) (__wasilibc_dttoif(x))
-
-int __wasilibc_iftodt(int x);
-int __wasilibc_dttoif(int x);
 
 #include <__struct_dirent.h>
 #include <__typedef_DIR.h>
@@ -23,6 +24,9 @@ int __wasilibc_dttoif(int x);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int __wasilibc_iftodt(int x);
+int __wasilibc_dttoif(int x);
 
 int closedir(DIR *);
 DIR *opendir(const char *);

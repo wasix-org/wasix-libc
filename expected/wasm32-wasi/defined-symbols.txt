@@ -462,6 +462,7 @@ __wasi_proc_snapshot
 __wasi_proc_spawn
 __wasi_proc_spawn2
 __wasi_random_get
+__wasi_reflect_signature
 __wasi_resolve
 __wasi_sched_yield
 __wasi_sock_accept
@@ -1759,6 +1760,7 @@ wasix_closure_allocate
 wasix_closure_free
 wasix_closure_prepare
 wasix_proc_snapshot
+wasix_reflect_signature
 wcpcpy
 wcpncpy
 wcrtomb

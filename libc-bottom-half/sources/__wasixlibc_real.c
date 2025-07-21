@@ -1202,3 +1202,20 @@ __wasi_errno_t __wasi_closure_free(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_reflect_signature(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("reflect_signature")
+));
+
+__wasi_errno_t __wasi_reflect_signature(
+    __wasi_function_pointer_t function_id,
+    __wasi_wasm_value_type_t * argument_types,
+    uint16_t argument_types_len,
+    __wasi_wasm_value_type_t * result_types,
+    uint16_t result_types_len,
+    __wasi_reflection_result_t *retptr0
+){
+    int32_t ret = __imported_wasix_32v1_reflect_signature((int32_t) function_id, (int32_t) argument_types, (int32_t) argument_types_len, (int32_t) result_types, (int32_t) result_types_len, (intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+

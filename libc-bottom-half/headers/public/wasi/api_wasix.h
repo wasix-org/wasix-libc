@@ -3803,6 +3803,35 @@ _Static_assert(_Alignof(__wasi_wasm_value_type_t) == 1, "witx calculated align")
  * A list of WASM value types.
  */
 /**
+ * Information about the signature of a function
+ */
+typedef struct __wasi_reflection_result_t {
+    /**
+     * Cacheable is set if the signature of the function will not change in the future
+     */
+    __wasi_bool_t cacheable;
+
+    /**
+     * Number of arguments of the function.
+     * 0 if the function does not exist
+     */
+    uint16_t arguments;
+
+    /**
+     * Number of results of the function.
+     * 0 if the function does not exist
+     */
+    uint16_t results;
+
+} __wasi_reflection_result_t;
+
+_Static_assert(sizeof(__wasi_reflection_result_t) == 6, "witx calculated size");
+_Static_assert(_Alignof(__wasi_reflection_result_t) == 2, "witx calculated align");
+_Static_assert(offsetof(__wasi_reflection_result_t, cacheable) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_reflection_result_t, arguments) == 2, "witx calculated offset");
+_Static_assert(offsetof(__wasi_reflection_result_t, results) == 4, "witx calculated offset");
+
+/**
  * @defgroup wasix_32v1
  * @{
  */
@@ -5131,6 +5160,66 @@ __wasi_errno_t __wasi_closure_free(
      * An index into the indirect function table that was previously allocated with closure_allocate
      */
     __wasi_function_pointer_t closure_id
+) __attribute__((__warn_unused_result__));
+/**
+ * Provides information about the signature of a function in the indirect
+ * function table at runtime.
+ * 
+ * ### Errors
+ * 
+ * Besides the standard error codes, `reflect_signature` may set `errno` to the
+ * following errors:
+ * 
+ * - EINVAL: The function pointer is not valid, i.e. it does not point to a
+ * function in the indirect function table or the function has a unsupported
+ * signature. The sizes in the result are undefined in this case.
+ * 
+ * - EOVERFLOW: The argument_types and result_types buffers were not big enough
+ * to hold the signature. They will be left unchanged. The reflection result
+ * will be valid.
+ * @return
+ * The number of arguments and results and whether this result is cacheable.
+ */
+__wasi_errno_t __wasi_reflect_signature(
+    /**
+     * An index into the indirect function table.
+     * 
+     * If there is no function at the requested slot, `EINVAL` will be returned.
+     */
+    __wasi_function_pointer_t function_id,
+    /**
+     * A buffer for a list of types that the function takes as arguments.
+     * 
+     * - If the buffer is too small to hold all argument types, it and
+     * `result_types` remain untouched, and `EOVERFLOW` is returned.
+     * - If the buffer is big enough, the types will be written to the buffer.
+     * - If the buffer is too big, all remaining bytes will be unchanged.
+     * 
+     * If the `argument_types_len` is 0 this buffer is never accessed and can be
+     * null.
+     */
+    __wasi_wasm_value_type_t * argument_types,
+    /**
+     * Size of the buffer for argument types.
+     */
+    uint16_t argument_types_len,
+    /**
+     * A buffer for a list of types that the function returns as results.
+     * 
+     * - If the buffer is too small to hold all argument types, it and
+     * `argument_types` remain untouched, and `EOVERFLOW` is returned.
+     * - If  the buffer is big enough, the types will be written to the buffer.
+     * - If the buffer is too big, all remaining bytes will be unchanged.
+     * 
+     * If the `result_types_len` is 0 this buffer is never accessed and can be
+     * null.
+     */
+    __wasi_wasm_value_type_t * result_types,
+    /**
+     * Size of the buffer for result types.
+     */
+    uint16_t result_types_len,
+    __wasi_reflection_result_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /** @} */
 

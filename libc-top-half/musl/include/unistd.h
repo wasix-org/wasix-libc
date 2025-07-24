@@ -237,7 +237,9 @@ int sethostname(const char *, size_t);
 int getdomainname(char *, size_t);
 int setdomainname(const char *, size_t);
 int setgroups(size_t, const gid_t *);
+#endif
 char *getpass(const char *);
+#ifdef __wasilibc_unmodified_upstream
 int daemon(int, int);
 void setusershell(void);
 void endusershell(void);

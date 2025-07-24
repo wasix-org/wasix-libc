@@ -215,6 +215,7 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
         ldso/dlsym.c \
         stat/futimesat.c \
         legacy/getpagesize.c \
+        legacy/getpass.c \
         thread/thrd_sleep.c \
         wasix/call_dynamic.c \
         wasix/closure_allocate.c \

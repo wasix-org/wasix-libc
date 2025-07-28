@@ -130,11 +130,9 @@ static struct builtin_tls
 #define MIN_TLS_ALIGN offsetof(struct builtin_tls, pt)
 
 static struct tls_module main_tls;
-#endif
 
 void *__copy_tls(unsigned char *mem)
 {
-#ifdef __wasilibc_unmodified_upstream
 	pthread_t td;
 	struct tls_module *p;
 	size_t i;
@@ -168,13 +166,8 @@ void *__copy_tls(unsigned char *mem)
 	dtv[0] = libc.tls_cnt;
 	td->dtv = dtv;
 	return td;
-#else
-	// This is impossible for WASIX with non-local-exec TLS model, so just trap
-	__builtin_trap();
-#endif
 }
 
-#ifdef __wasilibc_unmodified_upstream
 #if ULONG_MAX == 0xffffffff
 typedef Elf32_Phdr Phdr;
 #else

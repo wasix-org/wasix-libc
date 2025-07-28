@@ -6970,6 +6970,7 @@
 #define wasix_closure_h 
 #define wasix_function_pointer_h 
 #define wasix_function_pointer_t __wasi_function_pointer_t
+#define wasix_reflection_h 
 #define wasix_value_type_h 
 #define wasix_value_type_t __wasi_wasm_value_type_t
 #define xEOF 236

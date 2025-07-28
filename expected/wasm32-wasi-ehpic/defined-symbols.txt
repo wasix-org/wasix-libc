@@ -997,6 +997,7 @@ getopt
 getopt_long
 getopt_long_only
 getpagesize
+getpass
 getpeername
 getpgid
 getpgrp

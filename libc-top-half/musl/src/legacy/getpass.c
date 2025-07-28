@@ -12,7 +12,12 @@ char *getpass(const char *prompt)
 	ssize_t l;
 	static char password[128];
 
+	#ifdef __wasilibc_unmodified_upstream // See TODO comment below
 	if ((fd = open("/dev/tty", O_RDWR|O_NOCTTY|O_CLOEXEC)) < 0) return 0;
+	#else
+	// TODO: This implementation is wrong. It should not use stdin and stdout, but rather /dev/tty which we don't support yet.
+	if ((fd = open("/dev/stdin", O_RDONLY|O_CLOEXEC)) < 0) return 0;
+	#endif
 
 	tcgetattr(fd, &t);
 	s = t;
@@ -23,7 +28,12 @@ char *getpass(const char *prompt)
 	tcsetattr(fd, TCSAFLUSH, &t);
 	tcdrain(fd);
 
+	#ifdef __wasilibc_unmodified_upstream // See TODO comment above
 	dprintf(fd, "%s", prompt);
+	#else
+	fprintf(stderr, "%s", prompt);
+	fflush(stderr);
+	#endif
 
 	l = read(fd, password, sizeof password);
 	if (l >= 0) {
@@ -33,7 +43,12 @@ char *getpass(const char *prompt)
 
 	tcsetattr(fd, TCSAFLUSH, &s);
 
+	#ifdef __wasilibc_unmodified_upstream // See TODO comment above
 	dprintf(fd, "\n");
+	#else
+	fprintf(stderr, "%s", prompt);
+	fflush(stderr);
+	#endif
 	close(fd);
 
 	return l<0 ? 0 : password;

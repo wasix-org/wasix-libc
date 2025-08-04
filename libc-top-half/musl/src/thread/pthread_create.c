@@ -481,7 +481,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 			if (!map) goto fail;
 		}
 #endif
-		tsd = map + size - __pthread_tsd_size;
+		tsd = map + guard + size - __pthread_tsd_size;
 		new_pthread = tsd - pthread_size;
 		if (!stack) {
 #ifdef __wasilibc_unmodified_upstream
@@ -502,7 +502,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 	new_tls_base -= (uintptr_t)new_tls_base & (tls_align - 1);
 
 	new = new_pthread;
-	new += pthread_align;
+	new = (void*)new + pthread_align;
 	new -= (uintptr_t)new & (pthread_align - 1);
 	
 #endif

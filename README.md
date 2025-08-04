@@ -15,7 +15,7 @@ additional extensions:
 - current directory support (`chdir`) integrated with the runtime
 - `libffi` support
 - `dlopen` / `dlsym` / `dlopen` support
-- `setjmp` / `longjmp` support (used extensively in `libc` ) via `asyncify`
+- `setjmp` / `longjmp` support (used extensively in `libc` ) via WASM excpetion handling or `asyncify`
 - process forking (`fork` and `vfork` )
 - subprocess spawning and waiting (`exec` , `wait` )
 - TTY support

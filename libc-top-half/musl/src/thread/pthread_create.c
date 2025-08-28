@@ -482,6 +482,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 		}
 #endif
 		tsd = map + guard + size - __pthread_tsd_size;
+		memset(tsd, 0, __pthread_tsd_size);
 		new_pthread = tsd - pthread_size;
 		if (!stack) {
 #ifdef __wasilibc_unmodified_upstream

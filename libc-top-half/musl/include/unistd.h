@@ -134,9 +134,11 @@ unsigned sleep(unsigned);
 int pause(void);
 #endif
 
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
 pid_t fork(void);
 pid_t _fork_internal(int copy_mem);
 pid_t _Fork(int copy_mem);
+#endif
 int execve(const char *, char *const [], char *const []);
 int execv(const char *, char *const []);
 int execle(const char *, const char *, ...);
@@ -225,7 +227,9 @@ unsigned ualarm(unsigned, unsigned);
 int brk(void *);
 #endif
 void *sbrk(intptr_t);
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
 pid_t vfork(void);
+#endif
 #ifdef __wasilibc_unmodified_upstream /* WASI has no processes */
 int vhangup(void);
 int chroot(const char *);

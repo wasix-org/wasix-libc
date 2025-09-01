@@ -31,7 +31,6 @@ __clock
 __clock_gettime
 __clock_nanosleep
 __clock_settime
-__clone
 __cos
 __cosdf
 __cosl

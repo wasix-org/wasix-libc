@@ -10,6 +10,8 @@
 #include "pthread_impl.h"
 #include "aio_impl.h"
 
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
+
 static void dummy(int x) { }
 weak_alias(dummy, __aio_atfork);
 
@@ -60,3 +62,5 @@ pid_t _Fork(int copy_mem)
 	__restore_sigs(&set);
 	return __syscall_ret(ret);
 }
+
+#endif /* defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__) */

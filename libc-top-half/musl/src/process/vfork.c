@@ -5,6 +5,8 @@
 #include "syscall.h"
 #endif
 
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
+
 pid_t vfork(void)
 {
 #ifdef __wasilibc_unmodified_upstream
@@ -18,3 +20,5 @@ pid_t vfork(void)
 	return _fork_internal(0);
 #endif
 }
+
+#endif /* defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__) */

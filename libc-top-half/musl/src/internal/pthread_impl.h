@@ -166,7 +166,9 @@ extern hidden volatile size_t __pthread_tsd_size;
 extern hidden void *__pthread_tsd_main[];
 extern hidden volatile int __eintr_valid_flag;
 
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
 hidden int __clone(int (*)(void *), void *, int, void *, ...);
+#endif
 hidden int __set_thread_area(void *);
 #ifdef __wasilibc_unmodified_upstream /* WASI has no sigaction */
 hidden int __libc_sigaction(int, const struct sigaction *, struct sigaction *);

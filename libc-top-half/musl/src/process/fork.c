@@ -51,6 +51,8 @@ weak_alias(dummy_0, __tl_lock);
 weak_alias(dummy_0, __tl_unlock);
 #endif
 
+#if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
+
 pid_t fork(void)
 {
 	return _fork_internal(1);
@@ -100,3 +102,5 @@ pid_t _fork_internal(int copy_mem)
 	if (ret<0) errno = errno_save;
 	return ret;
 }
+
+#endif /* defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__) */

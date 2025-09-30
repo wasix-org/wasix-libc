@@ -71,8 +71,9 @@ LIBC_BOTTOM_HALF_ALL_SOURCES = \
 LIBC_BOTTOM_HALF_ALL_SOURCES := $(filter-out $(LIBC_BOTTOM_HALF_SOURCES)/chdir.c,$(LIBC_BOTTOM_HALF_ALL_SOURCES))
 LIBC_BOTTOM_HALF_ALL_SOURCES := $(LIBC_BOTTOM_HALF_ALL_SOURCES) $(LIBC_BOTTOM_HALF_SOURCES)/chdir.c
 
+# shm_open.c is included in the main libc.
 LIBWASI_EMULATED_MMAN_SOURCES = \
-    $(sort $(shell find $(LIBC_BOTTOM_HALF_DIR)/mman -name \*.c))
+    $(filter-out %/shm_open.c,$(sort $(shell find $(LIBC_BOTTOM_HALF_DIR)/mman -name \*.c)))
 LIBWASI_EMULATED_PROCESS_CLOCKS_SOURCES = \
     $(sort $(shell find $(LIBC_BOTTOM_HALF_DIR)/clocks -name \*.c))
 LIBWASI_EMULATED_GETPID_SOURCES = \
@@ -107,6 +108,7 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
         misc/nftw.c \
 	misc/realpath.c \
         misc/syslog.c \
+        mman/shm_open.c \
         errno/strerror.c \
         \
         network/services.c \

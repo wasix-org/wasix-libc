@@ -1529,6 +1529,8 @@ setspent
 setstate
 setuid
 setvbuf
+shm_open
+shm_unlink
 shutdown
 sigaction
 sigaction_external_default

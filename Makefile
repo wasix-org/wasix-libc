@@ -792,7 +792,7 @@ check-symbols: startup_files libc
 
 install: finish
 	mkdir -p "$(INSTALL_DIR)"
-	cp -r "$(SYSROOT)/lib" "$(SYSROOT)/share" "$(SYSROOT)/include" "$(INSTALL_DIR)"
+	cp -r "$(SYSROOT)/lib" "$(SYSROOT)/include" "$(INSTALL_DIR)"
 
 clean:
 	$(RM) -r build

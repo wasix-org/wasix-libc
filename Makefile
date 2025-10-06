@@ -11,8 +11,31 @@ endif
 EXTRA_CFLAGS ?= -O2 -DNDEBUG -ftls-model=local-exec -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_PROCESS_CLOCKS
 # The directory where we build the sysroot.
 SYSROOT ?= $(CURDIR)/sysroot
-# A directory to install to for "make install".
+
+# Standard variable to set the install directory
+# see https://www.gnu.org/prep/standards/html_node/DESTDIR.html
+DESTDIR     ?= 
+# While not standard, we previously used INSTALL_DIR to specify the prefix
+# Now it's used as the default for PREFIX
 INSTALL_DIR ?= /usr/local
+# directory variables : GNU conventions prefer lowercase
+# see https://www.gnu.org/prep/standards/html_node/Makefile-Conventions.html
+# support both lower and uppercase (BSD), use lower in script
+PREFIX      ?= $(INSTALL_DIR)
+prefix      ?= $(PREFIX)
+EXEC_PREFIX ?= $(prefix)
+exec_prefix ?= $(EXEC_PREFIX)
+BINDIR      ?= $(exec_prefix)/bin
+bindir      ?= $(BINDIR)
+LIBDIR      ?= $(exec_prefix)/lib/wasm32-wasi
+libdir      ?= $(LIBDIR)
+INCLUDEDIR  ?= $(prefix)/include
+includedir  ?= $(INCLUDEDIR)
+DATAROOTDIR ?= $(prefix)/share
+datarootdir ?= $(DATAROOTDIR)
+DATADIR     ?= $(datarootdir)
+datadir     ?= $(DATAROOTDIR)
+
 # single or posix; note that pthread support is still a work-in-progress.
 THREAD_MODEL ?= posix
 # dlmalloc or none
@@ -790,8 +813,12 @@ check-symbols: startup_files libc
 	diff -wur "expected/$(TARGET_TRIPLE)" "$(SYSROOT_SHARE)"
 
 install: finish
-	mkdir -p "$(INSTALL_DIR)"
-	cp -r "$(SYSROOT)/lib" "$(SYSROOT)/include" "$(INSTALL_DIR)"
+	mkdir -p "$(DESTDIR)$(libdir)"
+	cp -rT "$(SYSROOT_LIB)" "$(DESTDIR)$(libdir)"
+	mkdir -p "$(DESTDIR)$(includedir)"
+	cp -rT "$(SYSROOT_INC)" "$(DESTDIR)$(includedir)"
+#   mkdir -p "$(DESTDIR)$(datarootdir)"
+#   cp -rT "$(SYSROOT_SHARE)" "$(DESTDIR)$(datarootdir)"
 
 clean:
 	$(RM) -r build

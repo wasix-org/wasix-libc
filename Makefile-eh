@@ -830,10 +830,16 @@ check-symbols: startup_files libc
 install: finish
 	mkdir -p "$(DESTDIR)$(libdir)"
 	cp -rT "$(SYSROOT_LIB)" "$(DESTDIR)$(libdir)"
+
 	mkdir -p "$(DESTDIR)$(includedir)"
 	cp -rT "$(SYSROOT_INC)" "$(DESTDIR)$(includedir)"
-#   mkdir -p "$(DESTDIR)$(datarootdir)"
-#   cp -rT "$(SYSROOT_SHARE)" "$(DESTDIR)$(datarootdir)"
+
+	# mkdir -p "$(DESTDIR)$(datarootdir)"
+	# cp -rT "$(SYSROOT_SHARE)" "$(DESTDIR)$(datarootdir)"
+
+	# For some reason we want this lib when testing symbols, but not when installing?
+	# The oldest I could trace this is https://github.com/wasix-org/wasix-libc/blame/cd4cb2b9d9b030ec27806234198481907ef0d13a/build64.sh#L33-L33C56
+	rm -f "$(DESTDIR)$(libdir)/libc-printscan-long-double.a"
 
 clean:
 	$(RM) -r build

@@ -807,6 +807,9 @@ check-symbols: startup_files libc
 install: finish
 	mkdir -p "$(INSTALL_DIR)"
 	cp -r "$(SYSROOT)/lib" "$(SYSROOT)/share" "$(SYSROOT)/include" "$(INSTALL_DIR)"
+	
+	# Not used
+	rm -f "$(SYSROOT)/lib/libc-printscan-long-double.a"
 
 clean:
 	$(RM) -r build

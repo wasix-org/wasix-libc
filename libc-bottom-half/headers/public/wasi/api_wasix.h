@@ -5221,6 +5221,19 @@ __wasi_errno_t __wasi_reflect_signature(
     uint16_t result_types_len,
     __wasi_reflection_result_t *retptr0
 ) __attribute__((__warn_unused_result__));
+__wasi_errno_t __wasi_coroutine_context(
+    __wasi_function_pointer_t entrypoint
+) __attribute__((__warn_unused_result__));
+__wasi_errno_t __wasi_coroutine_new(
+    uint32_t * new_coroutine_ptr,
+    __wasi_function_pointer_t entrypoint
+) __attribute__((__warn_unused_result__));
+__wasi_errno_t __wasi_coroutine_switch(
+    uint32_t next_coroutine
+) __attribute__((__warn_unused_result__));
+__wasi_errno_t __wasi_coroutine_delete(
+    uint32_t coroutine
+) __attribute__((__warn_unused_result__));
 /** @} */
 
 #ifdef __cplusplus

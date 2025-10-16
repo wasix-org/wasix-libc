@@ -1219,3 +1219,52 @@ __wasi_errno_t __wasi_reflect_signature(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_coroutine_context(int32_t arg0) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("coroutine_context")
+));
+
+__wasi_errno_t __wasi_coroutine_context(
+    __wasi_function_pointer_t entrypoint
+){
+    int32_t ret = __imported_wasix_32v1_coroutine_context((int32_t) entrypoint);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_coroutine_new(int32_t arg0, int32_t arg1) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("coroutine_new")
+));
+
+__wasi_errno_t __wasi_coroutine_new(
+    uint32_t * new_coroutine_ptr,
+    __wasi_function_pointer_t entrypoint
+){
+    int32_t ret = __imported_wasix_32v1_coroutine_new((int32_t) new_coroutine_ptr, (int32_t) entrypoint);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_coroutine_switch(int32_t arg0) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("coroutine_switch")
+));
+
+__wasi_errno_t __wasi_coroutine_switch(
+    uint32_t next_coroutine
+){
+    int32_t ret = __imported_wasix_32v1_coroutine_switch((int32_t) next_coroutine);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_coroutine_delete(int32_t arg0) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("coroutine_delete")
+));
+
+__wasi_errno_t __wasi_coroutine_delete(
+    uint32_t coroutine
+){
+    int32_t ret = __imported_wasix_32v1_coroutine_delete((int32_t) coroutine);
+    return (uint16_t) ret;
+}
+

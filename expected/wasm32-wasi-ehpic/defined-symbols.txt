@@ -1760,6 +1760,10 @@ wasix_call_dynamic
 wasix_closure_allocate
 wasix_closure_free
 wasix_closure_prepare
+wasix_continuation_context
+wasix_continuation_delete
+wasix_continuation_new
+wasix_continuation_switch
 wasix_proc_snapshot
 wasix_reflect_signature
 wcpcpy

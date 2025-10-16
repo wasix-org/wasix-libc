@@ -6968,6 +6968,7 @@
 #define versionsort64 versionsort
 #define wasix_call_dynamic_h 
 #define wasix_closure_h 
+#define wasix_continuation_h 
 #define wasix_function_pointer_h 
 #define wasix_function_pointer_t __wasi_function_pointer_t
 #define wasix_reflection_h 

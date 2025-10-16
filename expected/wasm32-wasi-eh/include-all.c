@@ -202,6 +202,7 @@
 #include <wasi/libc.h>
 #include <wasix/call_dynamic.h>
 #include <wasix/closure.h>
+#include <wasix/continuation.h>
 #include <wasix/function_pointer.h>
 #include <wasix/reflection.h>
 #include <wasix/value_type.h>

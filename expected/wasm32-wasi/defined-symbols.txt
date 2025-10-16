@@ -378,6 +378,10 @@ __wasi_clock_time_set
 __wasi_closure_allocate
 __wasi_closure_free
 __wasi_closure_prepare
+__wasi_coroutine_context
+__wasi_coroutine_delete
+__wasi_coroutine_new
+__wasi_coroutine_switch
 __wasi_dl_invalid_handle
 __wasi_dlopen
 __wasi_dlsym

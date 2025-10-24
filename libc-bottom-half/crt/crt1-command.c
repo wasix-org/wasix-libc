@@ -3,6 +3,7 @@
 extern void __wasi_init_tp(void);
 #endif
 #include <wasi/api.h>
+#include <wasix/continuation.h>
 extern void __wasm_call_ctors(void);
 extern int __main_void(void);
 extern void __wasm_call_dtors(void);
@@ -44,7 +45,12 @@ void _start(void) {
     // Call `__main_void` which will either be the application's zero-argument
     // `__main_void` function or a libc routine which obtains the command-line
     // arguments and calls `__main_argv_argc`.
-    int r = __main_void();
+
+    // The main continuation context gets set to this automatically
+    // wasix_continuation_id_t continuation_main_context;
+    wasix_continuation_context(&continuation_main_context, __main_void);
+    
+    int r = 99;
 
     // Call atexit functions, destructors, stdio cleanup, etc.
     __wasm_call_dtors();

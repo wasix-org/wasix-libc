@@ -8,7 +8,6 @@
 
 #include <wasi/api_wasi.h>
 #include <wasi/api_wasix.h>
-#include <wasix/function_pointer.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,37 +15,31 @@ extern "C" {
 
 typedef unsigned int wasix_continuation_id_t;
 
+extern wasix_continuation_id_t continuation_main_context;
 
 int wasix_continuation_context(
-    /**
-     * An index into the indirect function table.
-     */
-    wasix_function_pointer_t function_id
+    // The root continuation id will be written here.
+    wasix_continuation_id_t* new_continuation_ptr,
+    // An index into the indirect function table.
+    void (*context_fn)()
 );
 
+
 int wasix_continuation_new(
-    /**
-     * The new continuation id will be written here.
-     */
-    wasix_continuation_id_t* new_coroutine_ptr,
-    /**
-     * An index into the indirect function table.
-     */
-    wasix_function_pointer_t entrypoint
+    // The new continuation id will be written here.
+    wasix_continuation_id_t* new_continuation_ptr,
+    // An index into the indirect function table.
+    void (*entrypoint_fn)()
 );
 
 int wasix_continuation_switch(
-    /**
-     * The continuation id to switch to.
-     */
-    wasix_continuation_id_t next_coroutine
+    // The continuation id to switch to.
+    wasix_continuation_id_t next_continuation
 );
 
 int wasix_continuation_delete(
-    /**
-     * The continuation id to delete.
-     */
-    wasix_continuation_id_t coroutine
+    // The continuation id to delete.
+    wasix_continuation_id_t continuation
 );
 
 #ifdef __cplusplus

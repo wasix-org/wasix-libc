@@ -87,3 +87,7 @@ static_assert(EMEMVIOLATION == __WASI_ERRNO_MEMVIOLATION, "Value mismatch");
 static_assert(EUNKNOWN == __WASI_ERRNO_UNKNOWN, "Value mismatch");
 
 thread_local int errno = 0;
+
+// These values are used by reference-sysroot's dlmalloc.
+const int __EINVAL = EINVAL;
+const int __ENOMEM = ENOMEM;

@@ -373,10 +373,9 @@ __wasi_clock_time_set
 __wasi_closure_allocate
 __wasi_closure_free
 __wasi_closure_prepare
-__wasi_continuation_context
-__wasi_continuation_delete
-__wasi_continuation_new
-__wasi_continuation_switch
+__wasi_context_delete
+__wasi_context_new
+__wasi_context_switch
 __wasi_dl_invalid_handle
 __wasi_dlopen
 __wasi_dlsym
@@ -719,7 +718,7 @@ conj
 conjf
 conjl
 connect
-continuation_main_context
+context_main_context
 copysign
 copysignf
 copysignl
@@ -1753,10 +1752,9 @@ wasix_call_dynamic
 wasix_closure_allocate
 wasix_closure_free
 wasix_closure_prepare
-wasix_continuation_context
-wasix_continuation_delete
-wasix_continuation_new
-wasix_continuation_switch
+wasix_context_delete
+wasix_context_new
+wasix_context_switch
 wasix_proc_snapshot
 wasix_reflect_signature
 wcpcpy

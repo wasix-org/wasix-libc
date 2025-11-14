@@ -1219,53 +1219,40 @@ __wasi_errno_t __wasi_reflect_signature(
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_continuation_context(int32_t arg0, int32_t arg1) __attribute__((
+int32_t __imported_wasix_32v1_context_new(int32_t arg0, int32_t arg1) __attribute__((
     __import_module__("wasix_32v1"),
-    __import_name__("continuation_context")
+    __import_name__("context_new")
 ));
 
-__wasi_errno_t __wasi_continuation_context(
-    uint32_t * new_continuation_ptr,
+__wasi_errno_t __wasi_context_new(
+    __wasi_context_id_t * new_context_ptr,
     __wasi_function_pointer_t entrypoint
 ){
-    int32_t ret = __imported_wasix_32v1_continuation_context((int32_t) new_continuation_ptr, (int32_t) entrypoint);
+    int32_t ret = __imported_wasix_32v1_context_new((int32_t) new_context_ptr, (int32_t) entrypoint);
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_continuation_new(int32_t arg0, int32_t arg1) __attribute__((
+int32_t __imported_wasix_32v1_context_switch(int64_t arg0) __attribute__((
     __import_module__("wasix_32v1"),
-    __import_name__("continuation_new")
+    __import_name__("context_switch")
 ));
 
-__wasi_errno_t __wasi_continuation_new(
-    uint32_t * new_continuation_ptr,
-    __wasi_function_pointer_t entrypoint
+__wasi_errno_t __wasi_context_switch(
+    __wasi_context_id_t next_context
 ){
-    int32_t ret = __imported_wasix_32v1_continuation_new((int32_t) new_continuation_ptr, (int32_t) entrypoint);
+    int32_t ret = __imported_wasix_32v1_context_switch((int64_t) next_context);
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_continuation_switch(int32_t arg0) __attribute__((
+int32_t __imported_wasix_32v1_context_delete(int64_t arg0) __attribute__((
     __import_module__("wasix_32v1"),
-    __import_name__("continuation_switch")
+    __import_name__("context_delete")
 ));
 
-__wasi_errno_t __wasi_continuation_switch(
-    uint32_t next_continuation
+__wasi_errno_t __wasi_context_delete(
+    __wasi_context_id_t context
 ){
-    int32_t ret = __imported_wasix_32v1_continuation_switch((int32_t) next_continuation);
-    return (uint16_t) ret;
-}
-
-int32_t __imported_wasix_32v1_continuation_delete(int32_t arg0) __attribute__((
-    __import_module__("wasix_32v1"),
-    __import_name__("continuation_delete")
-));
-
-__wasi_errno_t __wasi_continuation_delete(
-    uint32_t continuation
-){
-    int32_t ret = __imported_wasix_32v1_continuation_delete((int32_t) continuation);
+    int32_t ret = __imported_wasix_32v1_context_delete((int64_t) context);
     return (uint16_t) ret;
 }
 

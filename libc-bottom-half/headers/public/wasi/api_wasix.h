@@ -3832,6 +3832,15 @@ _Static_assert(offsetof(__wasi_reflection_result_t, arguments) == 2, "witx calcu
 _Static_assert(offsetof(__wasi_reflection_result_t, results) == 4, "witx calculated offset");
 
 /**
+ * ID of a WASIX context
+ * Can be obtained from context_create and used in other context_* functions
+ */
+typedef uint64_t __wasi_context_id_t;
+
+_Static_assert(sizeof(__wasi_context_id_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_context_id_t) == 8, "witx calculated align");
+
+/**
  * @defgroup wasix_32v1
  * @{
  */
@@ -5221,19 +5230,15 @@ __wasi_errno_t __wasi_reflect_signature(
     uint16_t result_types_len,
     __wasi_reflection_result_t *retptr0
 ) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_continuation_context(
-    uint32_t * new_continuation_ptr,
+__wasi_errno_t __wasi_context_new(
+    __wasi_context_id_t * new_context_ptr,
     __wasi_function_pointer_t entrypoint
 ) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_continuation_new(
-    uint32_t * new_continuation_ptr,
-    __wasi_function_pointer_t entrypoint
+__wasi_errno_t __wasi_context_switch(
+    __wasi_context_id_t next_context
 ) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_continuation_switch(
-    uint32_t next_continuation
-) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_continuation_delete(
-    uint32_t continuation
+__wasi_errno_t __wasi_context_delete(
+    __wasi_context_id_t context
 ) __attribute__((__warn_unused_result__));
 /** @} */
 

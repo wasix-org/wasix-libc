@@ -248,7 +248,7 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
         wasix/closure_free.c \
         wasix/closure_prepare.c \
         wasix/reflection.c \
-        wasix/continuation.c \
+        wasix/context.c \
     ) \
     $(filter-out %/procfdname.c %/syscall.c %/syscall_ret.c %/vdso.c %/version.c, \
                  $(wildcard $(LIBC_TOP_HALF_MUSL_SRC_DIR)/internal/*.c)) \

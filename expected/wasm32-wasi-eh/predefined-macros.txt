@@ -6969,6 +6969,7 @@
 #define wasix_call_dynamic_h 
 #define wasix_closure_h 
 #define wasix_context_h 
+#define wasix_context_main (__wasix_context_main())
 #define wasix_function_pointer_h 
 #define wasix_function_pointer_t __wasi_function_pointer_t
 #define wasix_reflection_h 

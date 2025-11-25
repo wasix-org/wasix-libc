@@ -1219,16 +1219,16 @@ __wasi_errno_t __wasi_reflect_signature(
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_context_new(int32_t arg0, int32_t arg1) __attribute__((
+int32_t __imported_wasix_32v1_context_create(int32_t arg0, int32_t arg1) __attribute__((
     __import_module__("wasix_32v1"),
-    __import_name__("context_new")
+    __import_name__("context_create")
 ));
 
-__wasi_errno_t __wasi_context_new(
+__wasi_errno_t __wasi_context_create(
     __wasi_context_id_t * new_context_ptr,
     __wasi_function_pointer_t entrypoint
 ){
-    int32_t ret = __imported_wasix_32v1_context_new((int32_t) new_context_ptr, (int32_t) entrypoint);
+    int32_t ret = __imported_wasix_32v1_context_create((int32_t) new_context_ptr, (int32_t) entrypoint);
     return (uint16_t) ret;
 }
 
@@ -1244,15 +1244,15 @@ __wasi_errno_t __wasi_context_switch(
     return (uint16_t) ret;
 }
 
-int32_t __imported_wasix_32v1_context_delete(int64_t arg0) __attribute__((
+int32_t __imported_wasix_32v1_context_destroy(int64_t arg0) __attribute__((
     __import_module__("wasix_32v1"),
-    __import_name__("context_delete")
+    __import_name__("context_destroy")
 ));
 
-__wasi_errno_t __wasi_context_delete(
+__wasi_errno_t __wasi_context_destroy(
     __wasi_context_id_t context
 ){
-    int32_t ret = __imported_wasix_32v1_context_delete((int64_t) context);
+    int32_t ret = __imported_wasix_32v1_context_destroy((int64_t) context);
     return (uint16_t) ret;
 }
 

@@ -3832,8 +3832,9 @@ _Static_assert(offsetof(__wasi_reflection_result_t, arguments) == 2, "witx calcu
 _Static_assert(offsetof(__wasi_reflection_result_t, results) == 4, "witx calculated offset");
 
 /**
- * ID of a WASIX context
- * Can be obtained from context_create and used in other context_* functions
+ * Opaque identifier referring to a WASIX context.
+ * 
+ * See wasix/context.h for more details
  */
 typedef uint64_t __wasi_context_id_t;
 
@@ -5230,14 +5231,29 @@ __wasi_errno_t __wasi_reflect_signature(
     uint16_t result_types_len,
     __wasi_reflection_result_t *retptr0
 ) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_context_new(
+/**
+ * Create a new context.
+ * 
+ * See wasix/context.h for more details
+ */
+__wasi_errno_t __wasi_context_create(
     __wasi_context_id_t * new_context_ptr,
     __wasi_function_pointer_t entrypoint
 ) __attribute__((__warn_unused_result__));
+/**
+ * Suspend the active context and resume another.
+ * 
+ * See wasix/context.h for more details
+ */
 __wasi_errno_t __wasi_context_switch(
     __wasi_context_id_t next_context
 ) __attribute__((__warn_unused_result__));
-__wasi_errno_t __wasi_context_delete(
+/**
+ * Destroy a suspended or terminated context.
+ * 
+ * See wasix/context.h for more details
+ */
+__wasi_errno_t __wasi_context_destroy(
     __wasi_context_id_t context
 ) __attribute__((__warn_unused_result__));
 /** @} */

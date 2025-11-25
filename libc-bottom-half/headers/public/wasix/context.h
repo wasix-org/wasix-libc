@@ -24,10 +24,11 @@ extern "C" {
 // - **suspended**
 //   Execution is suspended and may be resumed with `wasix_context_switch()`.
 // - **terminated**
-//   The entrypoint has returned, thrown an uncaught exception, or triggered a trap.
+//   The entrypoint has returned, thrown an uncaught exception, or triggered a
+//   trap.
 // - **deleted**
-//   All resources associated with the context have been released; equivalent to a
-//   context that was never created.
+//   All resources associated with the context have been released; equivalent to
+//   a context that was never created.
 //
 // Contexts exist within a context-switching environment. A context may only
 // be resumed in the environment in which it was created. Future versions
@@ -54,7 +55,8 @@ extern "C" {
 // Opaque identifier referring to a WASIX context.
 //
 // A context identifier is valid only within the context-switching environment
-// from which it was obtained with `wasix_context_create()` or `wasix_context_main`.
+// from which it was obtained with `wasix_context_create()` or
+// `wasix_context_main`.
 typedef __wasi_context_id_t wasix_context_id_t;
 
 // Identifier of the main context of the current context-switching
@@ -99,7 +101,8 @@ extern wasix_context_id_t __wasix_context_main(void);
 // #### Errors
 // - `EINVAL` entrypoint is not a valid function with the required signature
 // - `EAGAIN` not in a context-switching environment
-// - `<memory-error>` Implementations may set `errno` to one of the WASIX-defined
+// - `<memory-error>` Implementations may set `errno` to one of the
+// WASIX-defined
 //   memory error codes if `context_id` or memory reachable from the arguments
 //   is invalid or inaccessible.
 int wasix_context_create(wasix_context_id_t *context_id,

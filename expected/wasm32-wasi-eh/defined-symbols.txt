@@ -373,8 +373,8 @@ __wasi_clock_time_set
 __wasi_closure_allocate
 __wasi_closure_free
 __wasi_closure_prepare
-__wasi_context_destroy
 __wasi_context_create
+__wasi_context_destroy
 __wasi_context_switch
 __wasi_dl_invalid_handle
 __wasi_dlopen
@@ -1752,8 +1752,8 @@ wasix_call_dynamic
 wasix_closure_allocate
 wasix_closure_free
 wasix_closure_prepare
-wasix_context_destroy
 wasix_context_create
+wasix_context_destroy
 wasix_context_switch
 wasix_proc_snapshot
 wasix_reflect_signature

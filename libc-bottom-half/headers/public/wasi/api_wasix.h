@@ -3803,6 +3803,40 @@ _Static_assert(_Alignof(__wasi_wasm_value_type_t) == 1, "witx calculated align")
  * A list of WASM value types.
  */
 /**
+ * A raw WASM value. The lowest bytes will be filled with
+ * the value, and extra bytes will be zero.
+ */
+typedef struct __wasi_wasm_raw_value_t {
+    uint64_t lower;
+
+    uint64_t upper;
+
+} __wasi_wasm_raw_value_t;
+
+_Static_assert(sizeof(__wasi_wasm_raw_value_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_wasm_raw_value_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_wasm_raw_value_t, lower) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_wasm_raw_value_t, upper) == 8, "witx calculated offset");
+
+/**
+ * A raw WASM value and its corresponding type.
+ */
+typedef struct __wasi_wasm_raw_value_with_type_t {
+    __wasi_wasm_raw_value_t value;
+
+    __wasi_wasm_value_type_t type;
+
+} __wasi_wasm_raw_value_with_type_t;
+
+_Static_assert(sizeof(__wasi_wasm_raw_value_with_type_t) == 24, "witx calculated size");
+_Static_assert(_Alignof(__wasi_wasm_raw_value_with_type_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_wasm_raw_value_with_type_t, value) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_wasm_raw_value_with_type_t, type) == 16, "witx calculated offset");
+
+/**
+ * A list of raw WASM values and types.
+ */
+/**
  * Information about the signature of a function
  */
 typedef struct __wasi_reflection_result_t {
@@ -5100,6 +5134,43 @@ __wasi_errno_t __wasi_call_dynamic(
      * If this is set to false, the function will not perform any checks.
      * Any missing bytes will be assumed to be zero and any extra bytes
      * will be ignored.
+     */
+    __wasi_bool_t strict
+) __attribute__((__warn_unused_result__));
+/**
+ * Call a function pointer with dynamic parameters.
+ */
+__wasi_errno_t __wasi_call_dynamic2(
+    /**
+     * An index into the __indirect_function_table
+     * 
+     * Your module needs to either import or export the table to be able
+     * to call this function.
+     */
+    __wasi_function_pointer_t function_id,
+    /**
+     * A buffer with the parameters to pass to the function and their types.
+     */
+    const __wasi_wasm_raw_value_with_type_t *values,
+    /**
+     * The length of the array pointed to by `values`.
+     */
+    size_t values_len,
+    /**
+     * A pointer to a buffer for the results of the function call.
+     */
+    __wasi_wasm_raw_value_with_type_t * results,
+    __wasi_pointersize_t * results_len,
+    /**
+     * 
+     * If this is set to true, the function will return an error if the
+     * length and types of the parameters and results do not match the
+     * function signature.
+     * 
+     * If this is set to false, the function will not perform any checks.
+     * Any missing values will be assumed to be zero and any extra values
+     * will be ignored. Also, results that don't fit will be discarded
+     * and extra space in the results buffer will be set to zero.
      */
     __wasi_bool_t strict
 ) __attribute__((__warn_unused_result__));

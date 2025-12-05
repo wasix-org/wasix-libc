@@ -18,6 +18,9 @@ extern "C"
 
 #define wasix_value_type_t __wasi_wasm_value_type_t
 
+#define wasix_raw_value_t __wasi_wasm_raw_value_t
+#define wasix_raw_value_with_type_t __wasi_wasm_raw_value_with_type_t
+
 #ifdef __cplusplus
 }
 #endif

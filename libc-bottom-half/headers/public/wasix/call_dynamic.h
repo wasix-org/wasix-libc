@@ -8,6 +8,7 @@
 #include <wasi/api_wasi.h>
 #include <wasi/api_wasix.h>
 #include <wasix/function_pointer.h>
+#include <wasix/value_type.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -33,38 +34,32 @@ int wasix_call_dynamic(
     wasix_function_pointer_t function_id,
     /**
      * A buffer with the parameters to pass to the function.
-     * This buffer is expected to contain all parameters sequentially
-     *
-     * For example if the function takes an i32 and an i64, the
-     * buffer will be 12 bytes long, with the first 4 bytes
-     * being the i32 and the next 8 bytes being the i64.
      */
-    void *values,
+    wasix_raw_value_with_type_t *values,
     /**
-     * The length of the array pointed to by `values`.
+     * The length of the array pointed to by `values`, in number
+     * of elements.
      */
     size_t values_len,
     /**
      * A pointer to a buffer for the results of the function call.
-     *
-     * In most cases this will be a single value, but it could also
-     * contain multiple values. The same rules apply as for the
-     * parameters, i.e. the buffer needs to be large enough
-     * to hold all the results sequentially.
      */
-    void *results,
+    wasix_raw_value_with_type_t *results,
     /**
-     * The length of the array pointed to by `results`.
+     * The length of the array pointed to by `results`, in number
+     * of elements. The value pointed to by this pointer will be updated
+     * to reflect the actual number of results written.
      */
-    size_t results_len,
+    size_t *results_len,
     /**
      * If this is set to true, the function will return an error if the
      * length and types of the parameters and results do not match the
      * function signature.
      *
      * If this is set to false, the function will not perform any checks.
-     * Any missing bytes will be assumed to be zero and any extra bytes
-     * will be ignored.
+     * Any missing values will be assumed to be zero and any extra values
+     * will be ignored. Also, results that don't fit will be discarded
+     * and extra space in the results buffer will be set to zero.
      */
     bool strict);
 

@@ -1160,6 +1160,23 @@ __wasi_errno_t __wasi_call_dynamic(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_call_dynamic2(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("call_dynamic2")
+));
+
+__wasi_errno_t __wasi_call_dynamic2(
+    __wasi_function_pointer_t function_id,
+    const __wasi_wasm_raw_value_with_type_t *values,
+    size_t values_len,
+    __wasi_wasm_raw_value_with_type_t * results,
+    __wasi_pointersize_t * results_len,
+    __wasi_bool_t strict
+){
+    int32_t ret = __imported_wasix_32v1_call_dynamic2((int32_t) function_id, (intptr_t) values, (intptr_t) values_len, (int32_t) results, (int32_t) results_len, (int32_t) strict);
+    return (uint16_t) ret;
+}
+
 int32_t __imported_wasix_32v1_closure_prepare(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("closure_prepare")

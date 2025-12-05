@@ -3,18 +3,18 @@
 
 int wasix_call_dynamic(
     wasix_function_pointer_t function_id,
-    void *values,
+    wasix_raw_value_with_type_t *values,
     size_t values_len,
-    void *results,
-    size_t results_len,
+    wasix_raw_value_with_type_t *results,
+    size_t *results_len,
     bool strict)
 {
-    int err = __wasi_call_dynamic(
+    int err = __wasi_call_dynamic2(
         function_id,
-        (uint8_t *)values,
+        values,
         values_len,
-        (uint8_t *)results,
-        results_len,
+        results,
+        (__wasi_pointersize_t*)results_len,
         strict ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE);
 
     if (err != __WASI_ERRNO_SUCCESS)

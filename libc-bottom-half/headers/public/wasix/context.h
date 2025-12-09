@@ -35,7 +35,7 @@ extern "C" {
 // of this API may relax this restriction.
 //
 // Each context-switching environment has a single main context which is always
-// the first active context in an context-switching environment. The main
+// the first active context in a context-switching environment. The main
 // context cannot be deleted. If the main context terminates, the entire
 // context-switching environment terminates.
 //

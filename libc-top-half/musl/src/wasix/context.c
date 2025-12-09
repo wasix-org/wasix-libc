@@ -7,7 +7,7 @@ wasix_context_id_t __wasix_context_main(void) {
   return 0; // Main context is always ID 0 for now
 }
 
-int wasix_context_create(wasix_context_id_t *context_id, void (*entrypoint)()) {
+int wasix_context_create(wasix_context_id_t *context_id, void (*entrypoint)(void)) {
   int err =
       __wasi_context_create(context_id, (__wasi_function_pointer_t)entrypoint);
 

@@ -46,11 +46,23 @@ extern "C" {
 // Behavior not specified here is implementation-defined and may be specified
 // in future revisions of this API.
 //
-// #### Wasmer implementation note:
+// #### Wasmer implementation note
 // In wasmer each thread corresponds to a context-switching environment
 // beginning at the program’s `main` function. During early initialization, no
 // context-switching environment may be available. This behavior may change in
-// future versions.
+// future versions. In practice you can assume that a context-switching
+// environment is available starting from the call to `main` if the engine
+// supports it.
+//
+// #### Interaction with forking
+// Forking will NOT fork the context switching environment. If a process calls
+// `fork()`, the replica of the process will not inherit the context-switching
+// environment. Instead it will enter a new context_switching environment with
+// the currently active context which will be its main context. Calling `fork()`
+// is not supported on any context other than the main context.
+//
+// A process created by `vfork()` will not be in a context-switching
+// environment until it calls a function from the `exec` family of functions.
 
 // Opaque identifier referring to a WASIX context.
 //
@@ -100,7 +112,7 @@ extern wasix_context_id_t __wasix_context_main(void);
 //
 // #### Errors
 // - `EINVAL` entrypoint is not a valid function with the required signature
-// - `EAGAIN` not in a context-switching environment
+// - `ENOTSUP` not in a context-switching environment
 // - `<memory-error>` Implementations may set `errno` to one of the
 // WASIX-defined
 //   memory error codes if `context_id` or memory reachable from the arguments
@@ -135,7 +147,7 @@ int wasix_context_create(wasix_context_id_t *context_id,
 // #### Errors
 // - `EINVAL` can not destroy the active context
 // - `EINVAL` can not destroy the main context
-// - `EAGAIN` not in a context-switching environment
+// - `ENOTSUP` not in a context-switching environment
 int wasix_context_destroy(wasix_context_id_t context_id);
 
 // Suspend the active context and resume another.
@@ -161,7 +173,7 @@ int wasix_context_destroy(wasix_context_id_t context_id);
 //
 // #### Errors
 // - `EINVAL` target context is not suspended
-// - `EAGAIN` not in a context-switching environment
+// - `ENOTSUP` not in a context-switching environment
 int wasix_context_switch(wasix_context_id_t target_context_id);
 
 #ifdef __cplusplus

@@ -60,7 +60,6 @@ int __timedwait_cp(volatile int *addr, int val,
 		top = &to;
 	}
 
-#ifdef __wasilibc_unmodified_upstream
 	r = -__futex4_cp(addr, FUTEX_WAIT|priv, val, top);
 	if (r != EINTR && r != ETIMEDOUT && r != ECANCELED) r = 0;
 	/* Mitigate bug in old kernels wrongly reporting EINTR for non-
@@ -68,11 +67,6 @@ int __timedwait_cp(volatile int *addr, int val,
 	 * when NO interrupting signal handlers have been installed, and
 	 * works by sigaction tracking whether that's the case. */
 	if (r == EINTR && !__eintr_valid_flag) r = 0;
-#else
-    volatile int waiters = 0;
-	__wait(addr, &waiters, val, 0);
-	r = 0;
-#endif
 
 	return r;
 }

@@ -41,7 +41,7 @@ extern "C" {
 //
 // If no context-switching environment is available, functions in this API fail
 // with `ENOTSUP`. The conditions under which a context-switching environment is
-// available are undefined.
+// available are implementation-defined.
 //
 // Behavior not specified here is implementation-defined and may be specified
 // in future revisions of this API.

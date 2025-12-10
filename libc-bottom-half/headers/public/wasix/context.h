@@ -40,7 +40,7 @@ extern "C" {
 // context-switching environment terminates.
 //
 // If no context-switching environment is available, functions in this API fail
-// with `EAGAIN`. The conditions under which a context-switching environment is
+// with `ENOTSUP`. The conditions under which a context-switching environment is
 // available are undefined.
 //
 // Behavior not specified here is implementation-defined and may be specified

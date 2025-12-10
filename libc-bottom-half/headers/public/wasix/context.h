@@ -107,8 +107,6 @@ extern wasix_context_id_t __wasix_context_main(void);
 // - Entrypoint threw an uncaught exception:
 //   The exception is re-thrown in the main context.
 //
-// This behavior may change in future versions.
-//
 // #### Parameters
 // - `context_id` pointer to where the new context identifier will be stored
 // - `entrypoint` function invoked when the context is first resumed
@@ -166,9 +164,8 @@ int wasix_context_destroy(wasix_context_id_t context_id);
 // If `target_context_id` refers to the active context, the call is a no-op.
 //
 // #### Wasmer implementation note
-// In the current Wasmer implementation, calling `wasix_context_switch()` in
-// the main context may produce a trap if another context terminates while the
-// main context is suspended. See the implementation note in
+// Calling this function in the may produce a trap if another context terminates
+// while the main context is suspended. See the implementation note in
 // `wasix_context_create()`.
 //
 // #### Parameters

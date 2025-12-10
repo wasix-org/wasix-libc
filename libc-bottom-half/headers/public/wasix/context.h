@@ -43,26 +43,33 @@ extern "C" {
 // with `ENOTSUP`. The conditions under which a context-switching environment is
 // available are implementation-defined.
 //
-// Behavior not specified here is implementation-defined and may be specified
+// Behavior not specified here may be implementation-defined or may be specified
 // in future revisions of this API.
 //
 // #### Wasmer implementation note
-// In wasmer each thread corresponds to a context-switching environment
-// beginning at the program’s `main` function. During early initialization, no
-// context-switching environment may be available. This behavior may change in
-// future versions. In practice you can assume that a context-switching
-// environment is available starting from the call to `main` if the engine
-// supports it.
+// In wasmer context-switching is available when the selected engine supports
+// it. Each thread corresponds to a context-switching environment beginning at
+// the program's `main` function or the threads entrypoint respectively. During
+// early initialization, no context-switching environment may be available.
+// This behavior may change in future versions.
 //
-// #### Interaction with forking
-// Forking will NOT fork the context switching environment. If a process calls
-// `fork()`, the replica of the process will not inherit the context-switching
+// Calling `fork()` or `vfork()` is only allowed on the main context. Forking
+// will not fork the context-switching environment, but create a new one with
+// the currently active context being the main context.
+//
+// A process created by `fork()` will not inherit the context-switching
 // environment. Instead it will enter a new context_switching environment with
 // the currently active context which will be its main context. Calling `fork()`
 // is not supported on any context other than the main context.
 //
-// A process created by `vfork()` will not be in a context-switching
-// environment until it calls a function from the `exec` family of functions.
+// A process created by `vfork()` will not be in a context-switching environment
+// until it calls a function from the `exec` family of functions. If a process
+// created by `vfork()` terminates by any other means than calling the `_exit()`
+// function before calling a `exec()` function, the behavior is undefined.
+// Currently this will lead to termination of the child AND the parent process.
+//
+// Calling `exec` will enter a new context-switching environment with the currently
+// active context being its main context.
 
 // Opaque identifier referring to a WASIX context.
 //

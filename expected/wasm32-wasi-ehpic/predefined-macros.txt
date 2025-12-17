@@ -6976,6 +6976,7 @@
 #define va_end(ap) __builtin_va_end(ap)
 #define va_start(ap,param) __builtin_va_start(ap, param)
 #define versionsort64 versionsort
+#define vfork() __vfork_internal(setjmp(__vfork_jump_temporary))
 #define wasix_call_dynamic_h 
 #define wasix_closure_h 
 #define wasix_context_h 

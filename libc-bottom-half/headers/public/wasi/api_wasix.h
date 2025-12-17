@@ -4194,6 +4194,24 @@ __wasi_errno_t __wasi_proc_fork(
     __wasi_pid_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**
+ * Forks only the environment of the current process into a new subprocess,
+ * without modifying the control flow. The semantics match up with the
+ * traditional `vfork` system call. It is important to note that this
+ * will not setup anything related to control flow - the new process
+ * will continue in the same memory and call stack as the parent process.
+ * After calling this function the next successful call to proc_exit or
+ * proc_exec will return (which it normally does not). After such a
+ * return the environment is set back to that of the parent process.
+ * Opposed to vforking with proc_fork the control flow will NOT be
+ * moved back to the point where proc_fork was called.
+ * 
+ * This function is intended to be used in conjunction with
+ * setjmp/longjmp to build a lightweight implementation of vforking.
+ */
+__wasi_errno_t __wasi_proc_fork_env(
+    __wasi_pid_t *retptr0
+) __attribute__((__warn_unused_result__));
+/**
  * execv()  executes  the  program  referred to by pathname.  This causes the
  * program that is currently being run by the calling process to  be  replaced
  * with  a  new  program, with newly initialized stack, heap, and (initialized

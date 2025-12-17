@@ -368,6 +368,18 @@ __wasi_errno_t __wasi_proc_fork(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_proc_fork_env(int32_t arg0) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("proc_fork_env")
+));
+
+__wasi_errno_t __wasi_proc_fork_env(
+    __wasi_pid_t *retptr0
+){
+    int32_t ret = __imported_wasix_32v1_proc_fork_env((intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+
 _Noreturn void __imported_wasix_32v1_proc_exec(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("proc_exec")

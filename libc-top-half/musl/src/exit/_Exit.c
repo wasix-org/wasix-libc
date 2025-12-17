@@ -11,7 +11,13 @@ _Noreturn void _Exit(int ec)
 	__syscall(SYS_exit_group, ec);
 	for (;;) __syscall(SYS_exit, ec);
 #else
-	for (;;) __wasi_proc_exit(ec);
+	for (;;) {
+		__wasi_proc_exit(ec);
+		#ifdef __wasm_exception_handling__
+        extern _Noreturn void __vfork_restore();
+		__vfork_restore();
+		#endif
+	}
 #endif
 }
 

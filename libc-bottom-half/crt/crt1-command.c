@@ -53,5 +53,11 @@ void _start(void) {
     // `__wasi_proc_exit`.
     if (r != 0) {
         __wasi_proc_exit(r);
+        #ifdef __wasm_exception_handling__
+        // TODO: This case is only reachable with the new vforking and totally undefined behaviour
+        // as a vfork should never return from main
+        // Calling proc_exit again, makes the parent process exit with the same code as the child.
+        __wasi_proc_exit(r);
+        #endif
     }
 }

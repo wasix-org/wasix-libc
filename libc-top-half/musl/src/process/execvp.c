@@ -92,6 +92,12 @@ int __execvpe(const char *path, char *const argv[], char *const envp[], uint8_t 
 	int e = __wasi_proc_exec3(
 		path, combined_argv, combined_env,
 		use_path ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE, getenv("PATH"));
+	#ifdef __wasm_exception_handling__
+	if (e == 0) {
+        extern _Noreturn void __vfork_restore();
+	    __vfork_restore();
+	}
+	#endif
 
 	free(combined_argv);
 	free(combined_env);

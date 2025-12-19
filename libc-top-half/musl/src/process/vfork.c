@@ -57,7 +57,7 @@ pid_t __vfork_internal(int setjmp_result) {
     }
 
     // If the vfork was successful swap the jump buffers
-    __vfork_jump_free_index = __vfork_jump_free_index ? 1 : 0;
+    __vfork_jump_free_index = 1 - __vfork_jump_free_index;
 
     // If the vfork succeeded we are now in the child
 
@@ -72,7 +72,7 @@ pid_t __vfork_internal(int setjmp_result) {
 // This function must be called in case proc_exit2 or proc_exec return without error
 _Noreturn void __vfork_restore() {
   // Longjmp back to the vfork call site in the parent
-  longjmp(__vfork_jump[__vfork_jump_free_index ? 1 : 0], 1);
+  longjmp(__vfork_jump[1 - __vfork_jump_free_index], 1);
   __builtin_unreachable();
 }
 

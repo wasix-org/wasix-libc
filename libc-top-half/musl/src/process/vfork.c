@@ -43,7 +43,7 @@ static _Thread_local pid_t __child_pid;
 // behavior.
 //
 // This should work fine, given that the guarantees of setjmp/longjmp and vfork
-// mostly align with each other The only major caveat is that we must call the
+// mostly align with each other. The only major caveat is that we must call the
 // setjmp in the function that called vfork, so vfork must be a macro and not a
 // real function. It expands to
 // `__vfork_internal(setjmp(__vfork_jump[__vfork_jump_free_index]))`.

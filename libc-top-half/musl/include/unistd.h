@@ -237,7 +237,7 @@ extern _Thread_local jmp_buf __vfork_jump[2];
 extern _Thread_local int __vfork_jump_free_index;
 extern pid_t __vfork_internal(int setjmp_result);
 /* This must be a macro, as setjmp needs to happen in the calling function */
-/* Technically that's not 100% POSIX compliant, as you can not take a pointer to vfork that way, but there's no other way. */
+/* Technically that's not 100% POSIX compliant, as you cannot take a pointer to vfork that way, but there's no other way. */
 #define vfork() __vfork_internal(setjmp(__vfork_jump[__vfork_jump_free_index]))
 #endif
 #ifdef __wasilibc_unmodified_upstream /* WASI has no processes */

@@ -357,6 +357,9 @@ __unlock
 __unlockfile
 __uselocale
 __utc
+__vfork_internal
+__vfork_jump_temporary
+__vfork_restore
 __vm_lock
 __vm_unlock
 __vm_wait
@@ -446,7 +449,9 @@ __wasi_proc_exec
 __wasi_proc_exec2
 __wasi_proc_exec3
 __wasi_proc_exit
+__wasi_proc_exit2
 __wasi_proc_fork
+__wasi_proc_fork_env
 __wasi_proc_id
 __wasi_proc_join
 __wasi_proc_parent

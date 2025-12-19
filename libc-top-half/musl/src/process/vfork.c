@@ -36,7 +36,7 @@ static pid_t __child_pid;
 // setjmp/longjmp based vfork implementation
 //
 // This implementation of vfork uses the wasix proc_vfork syscall to create a new
-// process that shares the address space with the parent until proc_exec* or proc_exit is
+// process that shares the address space with the parent until proc_exec* or proc_exit2 is
 // called. However the syscalls can not cause us to jump back to the point where vfork was called,
 // so we use setjmp/longjmp to simulate that behavior.
 //
@@ -69,7 +69,7 @@ pid_t __vfork_internal(int setjmp_result) {
   }
 }
 
-// This function must be called in case proc_exit or proc_exec return with errno set to 0
+// This function must be called in case proc_exit2 or proc_exec return without error
 [[ noreturn ]] void __vfork_restore() {
   // Longjmp back to the vfork call site in the parent
   longjmp(__vfork_jump, 1);

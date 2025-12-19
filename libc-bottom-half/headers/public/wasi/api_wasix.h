@@ -4212,8 +4212,8 @@ __wasi_errno_t __wasi_proc_fork_env(
     __wasi_pid_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**
- * Identical to `proc_exit`, but it returns when it is called
- * after `proc_fork_env`
+ * This is similar to `proc_exit` but it will switch back into the parent process
+ * and return control there if we are in a `proc_fork_env` (vfork) context.
  */
 void __wasi_proc_exit2(
     /**

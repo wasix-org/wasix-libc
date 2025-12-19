@@ -452,6 +452,7 @@ __wasi_proc_exec
 __wasi_proc_exec2
 __wasi_proc_exec3
 __wasi_proc_exit
+__wasi_proc_exit2
 __wasi_proc_fork
 __wasi_proc_fork_env
 __wasi_proc_id

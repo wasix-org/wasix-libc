@@ -380,6 +380,17 @@ __wasi_errno_t __wasi_proc_fork_env(
     return (uint16_t) ret;
 }
 
+void __imported_wasix_32v1_proc_exit2(int32_t arg0) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("proc_exit2")
+));
+
+void __wasi_proc_exit2(
+    __wasi_exitcode_t rval
+){
+    __imported_wasix_32v1_proc_exit2((int32_t) rval);
+}
+
 _Noreturn void __imported_wasix_32v1_proc_exec(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("proc_exec")

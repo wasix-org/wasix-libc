@@ -4212,6 +4212,16 @@ __wasi_errno_t __wasi_proc_fork_env(
     __wasi_pid_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**
+ * Identical to `proc_exit`, but it returns when it is called
+ * after `proc_fork_env`
+ */
+void __wasi_proc_exit2(
+    /**
+     * The exit code returned by the process.
+     */
+    __wasi_exitcode_t rval
+);
+/**
  * execv()  executes  the  program  referred to by pathname.  This causes the
  * program that is currently being run by the calling process to  be  replaced
  * with  a  new  program, with newly initialized stack, heap, and (initialized

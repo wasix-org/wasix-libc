@@ -64,13 +64,13 @@ pid_t __vfork_internal(int setjmp_result) {
     // In the child vfork returns 0
     return (pid_t)0;
   } else {
-    // In the parent vfork returns 0
+    // In the parent vfork returns the child pid
     return __child_pid;
   }
 }
 
 // This function must be called in case proc_exit2 or proc_exec return without error
-[[ noreturn ]] void __vfork_restore() {
+_Noreturn void __vfork_restore() {
   // Longjmp back to the vfork call site in the parent
   longjmp(__vfork_jump, 1);
   __builtin_unreachable();

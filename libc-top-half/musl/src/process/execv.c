@@ -31,8 +31,8 @@ int execv(const char *path, char *const argv[])
 	
 	int e = __wasi_proc_exec3(path, combined_argv, NULL, 0, NULL);
 	#ifdef __wasm_exception_handling__
+	extern _Noreturn void __vfork_restore();
 	if (e == 0) {
-        extern _Noreturn void __vfork_restore();
 	    __vfork_restore();
 	}
 	#endif

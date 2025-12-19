@@ -361,7 +361,8 @@ __unlockfile
 __uselocale
 __utc
 __vfork_internal
-__vfork_jump_temporary
+__vfork_jump
+__vfork_jump_free_index
 __vfork_restore
 __vm_lock
 __vm_unlock

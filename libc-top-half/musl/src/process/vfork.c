@@ -26,12 +26,12 @@ pid_t vfork(void)
 #include <errno.h>
 
 // __vfork_jump is the real jump buffer
-static jmp_buf __vfork_jump;
+_Thread_local jmp_buf __vfork_jump[2];
 // This is passed to setjmp and moved to __vfork_jump once we are in a new
 // environment
-jmp_buf __vfork_jump_temporary;
+_Thread_local int __vfork_jump_free_index = 0;
 // The pid of the vforked process
-static pid_t __child_pid;
+static _Thread_local pid_t __child_pid;
 
 // setjmp/longjmp based vfork implementation
 //
@@ -42,7 +42,7 @@ static pid_t __child_pid;
 //
 // This should work fine, given that the guarantees of setjmp/longjmp and vfork mostly align with each other
 // The only major caveat is that we must call the setjmp in the function that called vfork, so vfork must be a macro
-// and not a real function. It expands to `__vfork_internal(setjmp(__vfork_jump_temporary))`.
+// and not a real function. It expands to `__vfork_internal(setjmp(__vfork_jump[__vfork_jump_free_index]))`.
 //
 // proc_exit and proc_exec both return in the parent process after the child has exited or execed, so we need to
 // longjmp back to the original context in those cases.
@@ -56,8 +56,8 @@ pid_t __vfork_internal(int setjmp_result) {
       return (pid_t)-1;
     }
 
-    // If the vfork was successful move the jump buffer to the real jumpbuffer
-    __vfork_jump[0] = __vfork_jump_temporary[0];
+    // If the vfork was successful swap the jump buffers
+    __vfork_jump_free_index = __vfork_jump_free_index ? 1 : 0;
 
     // If the vfork succeeded we are now in the child
 
@@ -72,7 +72,7 @@ pid_t __vfork_internal(int setjmp_result) {
 // This function must be called in case proc_exit2 or proc_exec return without error
 _Noreturn void __vfork_restore() {
   // Longjmp back to the vfork call site in the parent
-  longjmp(__vfork_jump, 1);
+  longjmp(__vfork_jump[__vfork_jump_free_index ? 1 : 0], 1);
   __builtin_unreachable();
 }
 

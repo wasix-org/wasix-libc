@@ -4202,7 +4202,7 @@ __wasi_errno_t __wasi_proc_fork(
  * After calling this function the next successful call to proc_exit or
  * proc_exec will return (which it normally does not). After such a
  * return the environment is set back to that of the parent process.
- * As opposed to vforking with proc_fork the control flow will NOT be
+ * Opposed to vforking with proc_fork the control flow will NOT be
  * moved back to the point where proc_fork was called.
  * 
  * This function is intended to be used in conjunction with

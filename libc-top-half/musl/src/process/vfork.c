@@ -26,10 +26,12 @@ pid_t vfork(void) {
 
 #include <errno.h>
 
-// __vfork_jump is the real jump buffer
+// The jump buffers used by setjmp/longjmp to restore the parent context
+// __vfork_jump_free_index points to the index of a buffer that can be
+// overwritten. The other buffer should not be modified as it contains the
+// jmp_buf that can be used to longjmp back to the parent context after
+// proc_exit or proc_exec
 _Thread_local jmp_buf __vfork_jump[2];
-// This is passed to setjmp and moved to __vfork_jump once we are in a new
-// environment
 _Thread_local int __vfork_jump_free_index = 0;
 // The pid of the vforked process
 static _Thread_local pid_t __child_pid;

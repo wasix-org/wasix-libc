@@ -229,6 +229,16 @@ int brk(void *);
 void *sbrk(intptr_t);
 #if defined(__wasilibc_unmodified_upstream) || !defined(__wasm_exception_handling__)
 pid_t vfork(void);
+#elif defined(__wasm_exception_handling__)
+/* setjmp/longjmp based vfork implementation */
+#include <setjmp.h>
+/* Helper function and buffer for vfork */
+extern _Thread_local jmp_buf __vfork_jump[2];
+extern _Thread_local int __vfork_jump_free_index;
+extern pid_t __vfork_internal(int setjmp_result);
+/* This must be a macro, as setjmp needs to happen in the calling function */
+/* Technically that's not 100% POSIX compliant, as you cannot take a pointer to vfork that way, but there's no other way. */
+#define vfork() __vfork_internal(setjmp(__vfork_jump[__vfork_jump_free_index]))
 #endif
 #ifdef __wasilibc_unmodified_upstream /* WASI has no processes */
 int vhangup(void);

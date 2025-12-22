@@ -30,6 +30,12 @@ int execv(const char *path, char *const argv[])
 	*combined_argv_p = 0;
 	
 	int e = __wasi_proc_exec3(path, combined_argv, NULL, 0, NULL);
+#ifdef __wasm_exception_handling__
+	extern _Noreturn void __vfork_restore();
+	if (e == 0) {
+		__vfork_restore();
+	}
+#endif
 
 	// A return from proc_exec automatically means it failed
 	errno = e;

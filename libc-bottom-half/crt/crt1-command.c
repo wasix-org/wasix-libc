@@ -52,6 +52,14 @@ void _start(void) {
     // If main exited successfully, just return, otherwise call
     // `__wasi_proc_exit`.
     if (r != 0) {
-        __wasi_proc_exit(r);
+        __wasi_proc_exit2(r);
+
+        // This case is only reachable with the setjmp/longjmp-based vfork.
+        // If control ever returns here, it means the child continued
+        // execution past the function calling vfork without an intervening
+        // proc_exec or exit/_Exit, violating the required vfork semantics.
+        // Such a state is undefined behaviour, so this path is correctly
+        // marked unreachable.
+        __builtin_unreachable();
     }
 }

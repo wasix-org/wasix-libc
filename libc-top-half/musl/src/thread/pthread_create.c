@@ -124,6 +124,12 @@ _Noreturn void __pthread_exit(void *result)
 
 	/* At this point we are committed to thread termination. */
 
+	/* After the kernel thread exits, its tid may be reused. Clear it
+	 * to prevent inadvertent use and inform functions that would use
+	 * it that it's no longer available. */
+	self->tid = 0;
+	UNLOCK(self->killlock);
+
 #ifdef __wasilibc_unmodified_upstream
 	/* Process robust list in userspace to handle non-pshared mutexes
 	 * and the detached thread case where the robust list head will
@@ -162,14 +168,6 @@ _Noreturn void __pthread_exit(void *result)
 	self->prev->next = self->next;
 	self->prev = self->next = self;
 
-#ifndef __wasilibc_unmodified_upstream
-	/* On Linux, the thread is created with CLONE_CHILD_CLEARTID,
-	 * and this lock will unlock by kernel when this thread terminates.
-	 * So we should unlock it here in WebAssembly.
-	 * See also set_tid_address(2) */
-	__tl_unlock();
-#endif
-
 #ifdef __wasilibc_unmodified_upstream
 	if (state==DT_DETACHED && self->map_base) {
 		/* Detached threads must block even implementation-internal
@@ -199,12 +197,6 @@ _Noreturn void __pthread_exit(void *result)
 	/* Wake any joiner. */
 	a_store(&self->detach_state, DT_EXITED);
 	__wake(&self->detach_state, 1, 1);
-
-	/* After the kernel thread exits, its tid may be reused. Clear it
-	 * to prevent inadvertent use and inform functions that would use
-	 * it that it's no longer available. */
-	self->tid = 0;
-	UNLOCK(self->killlock);
 
 #ifdef __wasilibc_unmodified_upstream
 	for (;;) __syscall(SYS_exit, 0);
@@ -484,6 +476,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 		tsd = map + guard + size - __pthread_tsd_size;
 		memset(tsd, 0, __pthread_tsd_size);
 		new_pthread = tsd - pthread_size;
+		memset(new_pthread, 0, pthread_size);
 		if (!stack) {
 #ifdef __wasilibc_unmodified_upstream
 			stack = tsd - libc.tls_size;

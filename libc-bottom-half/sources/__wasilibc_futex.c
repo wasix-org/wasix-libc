@@ -1,3 +1,10 @@
+// We don't want to ever use the syscall-based futex implementation
+// in EH configurations, since that's mainly useful for journaling
+// and taking snapshots at random points is impossible without
+// module-wide asyncification.
+// Note that syscalls are many times slower than just using WASM atomics.
+#ifndef __wasm_exception_handling__
+
 #include <wasi/api.h>
 #include <sys/types.h>
 #include <limits.h>
@@ -57,3 +64,5 @@ int __wasilibc_futex_wake_wasix(int* futex, int cnt) {
   }
   return 0;
 }
+
+#endif

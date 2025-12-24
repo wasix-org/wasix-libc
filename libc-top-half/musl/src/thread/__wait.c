@@ -4,14 +4,12 @@
 #endif
 
 #ifndef __wasilibc_unmodified_upstream
-// Use WebAssembly's `wait` instruction to implement a futex. Note that `op` is
-// unused but retained as a parameter to match the original signature of the
-// syscall and that, for `max_wait_ns`, -1 (or any negative number) means wait
-// indefinitely.
+// Use WebAssembly's `wait` instruction to implement a futex. Note that
+// for `max_wait_ns`, -1 (or any negative number) means wait indefinitely.
 //
 // Adapted from Emscripten: see
 // https://github.com/emscripten-core/emscripten/blob/058a9fff/system/lib/pthread/emscripten_futex_wait.c#L111-L150.
-int __wasilibc_futex_wait(volatile void *addr, int op, int val, int64_t max_wait_ns)
+int __wasilibc_futex_wait(volatile void *addr, int val, int64_t max_wait_ns)
 {
     if ((((intptr_t)addr) & 3) != 0) {
         return -EINVAL;
@@ -48,10 +46,15 @@ void __wait(volatile int *addr, volatile int *waiters, int val, int priv)
 		__syscall(SYS_futex, addr, FUTEX_WAIT|priv, val, 0) != -ENOSYS
 		|| __syscall(SYS_futex, addr, FUTEX_WAIT, val, 0);
 #else
+// See comments in __wasilibc_futex.c
+#ifdef __wasm_exception_handling__
+		__wasilibc_futex_wait(addr, val, -1);
+#else
         // we feed the wait operation to a syscall rather than
         // use atomics so that the asyncify and journaling can
         // work properly
 		__wasilibc_futex_wait_wasix(addr, FUTEX_WAIT, val, -1);
+#endif
 #endif
 	}
 	if (waiters) a_dec(waiters);

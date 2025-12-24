@@ -4,7 +4,7 @@
 #endif
 
 #ifndef __wasilibc_unmodified_upstream
-// Use WebAssembly's `wait` instruction to implement a futex. Note that 
+// Use WebAssembly's `wait` instruction to implement a futex. Note that
 // for `max_wait_ns`, -1 (or any negative number) means wait indefinitely.
 //
 // Adapted from Emscripten: see

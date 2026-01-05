@@ -111,6 +111,11 @@ int __init_tp(void *p)
 	 *   of TIDs are 0.
 	 */
 	td->tid = 0x3fffffff;
+
+	if (&__stack_high) {
+		td->stack = &__stack_high;
+		td->stack_size = &__stack_high - &__stack_low;
+	}
 #endif
 	td->locale = &libc.global_locale;
 	td->robust_list.head = &td->robust_list.head;

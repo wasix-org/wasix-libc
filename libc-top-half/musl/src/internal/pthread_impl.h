@@ -176,7 +176,7 @@ hidden int __libc_sigaction(int, const struct sigaction *, struct sigaction *);
 hidden void __unmapself(void *, size_t);
 
 #ifndef __wasilibc_unmodified_upstream
-hidden int __wasilibc_futex_wait(volatile void *, int, int64_t);
+hidden int __wasilibc_futex_wait(volatile void *, int, int, int64_t);
 #endif
 hidden int __timedwait(volatile int *, int, clockid_t, const struct timespec *, int);
 hidden int __timedwait_cp(volatile int *, int, clockid_t, const struct timespec *, int);
@@ -189,12 +189,8 @@ static inline void __wake(volatile void *addr, int cnt, int priv)
 	__syscall(SYS_futex, addr, FUTEX_WAKE|priv, cnt) != -ENOSYS ||
 	__syscall(SYS_futex, addr, FUTEX_WAKE, cnt);
 #else
-// See comments in __wasilibc_futex.c
-#ifdef __wasm_exception_handling__
-	__builtin_wasm_memory_atomic_notify((int*)addr, cnt);
-#else
 	__wasilibc_futex_wake_wasix((int*)addr, cnt);
-#endif
+	//__builtin_wasm_memory_atomic_notify((int*)addr, cnt);
 #endif
 }
 static inline void __futexwait(volatile void *addr, int val, int priv)

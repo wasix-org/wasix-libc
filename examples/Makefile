@@ -56,6 +56,8 @@ SRC=$(wildcard *.c)
 export PATH := $(LLD_PATH):$(PATH)
 
 all: longjmp file-copy signal fork vfork fork-longjmp execve spawn pipe epoll getrandom readdir_tree
+	mkdir -p ../../wasmer/tests/integration/cli/tests/wasm
+	mkdir -p ../../packages/fork-test/test.wasm
 	cp -f ../dist/wasix/longjmp.wasm ../../wasmer/tests/integration/cli/tests/wasm/example-longjmp.wasm
 	cp -f ../dist/wasix/fork.wasm ../../wasmer/tests/integration/cli/tests/wasm/example-fork.wasm
 	cp -f ../dist/wasix/fork.wasm ../../packages/fork-test/test.wasm

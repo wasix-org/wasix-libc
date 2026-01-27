@@ -29,14 +29,14 @@ static int __futex4_cp(volatile void *addr, int op, int val, const struct timesp
 
 static volatile int dummy = 0;
 weak_alias(dummy, __eintr_valid_flag);
-#elif defined(__wasm_exception_handling__)
-static int __futex4_cp(volatile void *addr, int val, const struct timespec *to)
+#else
+static int __futex4_cp(volatile void *addr, int op, int val, const struct timespec *to)
 {
 	int64_t max_wait_ns = -1;
 	if (to) {
 		max_wait_ns = (int64_t)(to->tv_sec * 1000000000 + to->tv_nsec);
 	}
-	return __wasilibc_futex_wait(addr, val, max_wait_ns);
+	return __wasilibc_futex_wait_wasix(addr, op, val, max_wait_ns);
 }
 #endif
 
@@ -69,17 +69,9 @@ int __timedwait_cp(volatile int *addr, int val,
 	 * works by sigaction tracking whether that's the case. */
 	if (r == EINTR && !__eintr_valid_flag) r = 0;
 #else
-// See comments in __wasilibc_futex.c
-#ifdef __wasm_exception_handling__
-	r = -__futex4_cp(addr, val, top);
-	if (r != EINTR && r != ETIMEDOUT && r != ECANCELED) r = 0;
-#else
-	// Note, this is an UNtimed wait for some reason...
-	// it was like this when I found it, so I'm leaving it as is.
     volatile int waiters = 0;
 	__wait(addr, &waiters, val, 0);
 	r = 0;
-#endif
 #endif
 
 	return r;

@@ -20,7 +20,7 @@ case "${EH}-${PIC}" in
     ON-ON)   NAME="32-ehpic" ;;
     ON-OFF)  NAME="32-eh" ;;
     OFF-ON)  echo "PIC is only supported when exception handling is enabled" ; exit 1 ;;
-    OFF-OFF)  NAME="32-pic" ;;
+    OFF-OFF)  NAME="32" ;;
     *)       echo "Invalid EH/PIC combination: EH:${EH} PIC:${PIC}" ; exit 1 ;;
 esac
 

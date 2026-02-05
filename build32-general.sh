@@ -102,7 +102,7 @@ compiler_rt() {
         -S tools/llvm-project/compiler-rt
     cmake --build $compiler_rt_build_dir --parallel 16
     cmake --install $compiler_rt_build_dir
-    wasixranlib $compiler_rt_output/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a
+    llvm-ranlib $compiler_rt_output/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a
 }
 
 # Regenerate bindings in libc-bottom-half

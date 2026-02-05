@@ -24,6 +24,12 @@ case "${EH}-${PIC}" in
     *)       echo "Invalid EH/PIC combination: EH:${EH} PIC:${PIC}" ; exit 1 ;;
 esac
 
+if [ "$EH" = "ON" ]; then
+    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain
+else
+    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix.cmake_toolchain
+fi
+
 ### Path names of various build artifacts
 
 wasix_libc_output="build/wasix-libc-sysroot-$NAME"
@@ -87,7 +93,7 @@ compiler_rt() {
         -DCOMPILER_RT_HAS_FUNWIND_TABLES_FLAG=OFF \
         -DCMAKE_C_COMPILER_TARGET=wasm32-wasi \
         -DCOMPILER_RT_OS_DIR=wasm32-wasi \
-        -DCMAKE_TOOLCHAIN_FILE="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain \
+        -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
         -DCMAKE_SYSTEM_NAME=WASI \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$compiler_rt_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$compiler_rt_output \
@@ -148,6 +154,12 @@ wasix_libc() {
 
 # Build C++ sysroot
 libcxx() {
+    if [ "$EH" = "ON" ]; then
+        runtimes="libcxx;libcxxabi;libunwind"
+    else
+        runtimes="libcxx;libcxxabi"
+    fi
+
     # Cleanup previous build artifacts
     rm -rf $libcxx_build_dir
     rm -rf $libcxx_build_sysroot
@@ -161,7 +173,7 @@ libcxx() {
 
     cmake \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DCMAKE_TOOLCHAIN_FILE="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain \
+        -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$libcxx_output \
         -DCXX_SUPPORTS_CXX23=OFF \
@@ -173,13 +185,13 @@ libcxx() {
         -DCMAKE_BUILD_TYPE=RelWithDebugInfo \
         -DLIBCXX_ENABLE_SHARED:BOOL=OFF \
         -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY:BOOL=OFF \
-        -DLIBCXX_ENABLE_EXCEPTIONS:BOOL=ON \
+        -DLIBCXX_ENABLE_EXCEPTIONS:BOOL=$EH \
         -DLIBCXX_ENABLE_FILESYSTEM:BOOL=ON \
         -DLIBCXX_CXX_ABI=libcxxabi \
         -DLIBCXX_HAS_MUSL_LIBC:BOOL=ON \
         -DLIBCXX_ABI_VERSION=2 \
         -DLIBCXX_USE_COMPILER_RT=ON \
-        -DLIBCXXABI_ENABLE_EXCEPTIONS:BOOL=ON \
+        -DLIBCXXABI_ENABLE_EXCEPTIONS:BOOL=$EH \
         -DLIBCXXABI_ENABLE_SHARED:BOOL=OFF \
         -DLIBCXXABI_SILENT_TERMINATE:BOOL=ON \
         -DLIBCXXABI_ENABLE_THREADS:BOOL=ON \
@@ -188,13 +200,13 @@ libcxx() {
         -DLIBCXXABI_BUILD_EXTERNAL_THREAD_LIBRARY:BOOL=OFF \
         -DLIBCXXABI_HAS_WIN32_THREAD_API:BOOL=OFF \
         -DLIBCXXABI_ENABLE_PIC:BOOL=$PIC \
-        -DLIBCXXABI_USE_LLVM_UNWINDER:BOOL=ON \
+        -DLIBCXXABI_USE_LLVM_UNWINDER:BOOL=$EH \
         -DLIBUNWIND_ENABLE_SHARED:BOOL=OFF \
-        -DLIBUNWIND_ENABLE_STATIC:BOOL=ON \
-        -DLIBUNWIND_USE_COMPILER_RT:BOOL=ON \
-        -DLIBUNWIND_ENABLE_THREADS:BOOL=ON \
-        -DLIBUNWIND_HAS_PTHREAD_LIB:BOOL=ON \
-        -DLIBUNWIND_INSTALL_LIBRARY:BOOL=ON \
+        -DLIBUNWIND_ENABLE_STATIC:BOOL=$EH \
+        -DLIBUNWIND_USE_COMPILER_RT:BOOL=$EH \
+        -DLIBUNWIND_ENABLE_THREADS:BOOL=$EH \
+        -DLIBUNWIND_HAS_PTHREAD_LIB:BOOL=$EH \
+        -DLIBUNWIND_INSTALL_LIBRARY:BOOL=$EH \
         -DCMAKE_C_COMPILER_WORKS=ON \
         -DCMAKE_CXX_COMPILER_WORKS=ON \
         -DLLVM_COMPILER_CHECKED=ON \
@@ -202,7 +214,7 @@ libcxx() {
         -DLIBCXX_LIBDIR_SUFFIX=/wasm32-wasi \
         -DLIBCXXABI_LIBDIR_SUFFIX=/wasm32-wasi \
         -DLLVM_LIBDIR_SUFFIX=/wasm32-wasi \
-        -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" \
+        -DLLVM_ENABLE_RUNTIMES="$runtimes" \
         -B $libcxx_build_dir \
         -S tools/llvm-project/runtimes
     cmake --build $libcxx_build_dir --parallel 16

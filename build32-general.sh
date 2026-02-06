@@ -165,7 +165,7 @@ libcxx() {
     export WASIXCC_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot
 
     cmake \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE="$PIC" \
         -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$libcxx_output \

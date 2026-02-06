@@ -224,9 +224,9 @@ libcxx() {
 sysroot() {
     rm -rf $sysroot_output
     mkdir -p $sysroot_output
-    rsync -abviuzP  $compiler_rt_output/ $sysroot_output/
-    rsync -abviuzP  $wasix_libc_output/ $sysroot_output/
-    rsync -abviuzP  $libcxx_output/ $sysroot_output/
+    rsync -abiuz  $compiler_rt_output/ $sysroot_output/
+    rsync -abiuz  $wasix_libc_output/ $sysroot_output/
+    rsync -abiuz  $libcxx_output/ $sysroot_output/
 }
 
 ### Run build steps

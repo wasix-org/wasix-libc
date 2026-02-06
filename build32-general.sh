@@ -160,8 +160,8 @@ libcxx() {
 
 
     mkdir -p $libcxx_build_sysroot
-    rsync -abiuz  $compiler_rt_output/ $libcxx_build_sysroot/
-    rsync -abiuz  $wasix_libc_output/ $libcxx_build_sysroot/
+    rsync -abuz  $compiler_rt_output/ $libcxx_build_sysroot/
+    rsync -abuz  $wasix_libc_output/ $libcxx_build_sysroot/
     export WASIXCC_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot
 
     cmake \
@@ -217,9 +217,9 @@ libcxx() {
 sysroot() {
     rm -rf $sysroot_output
     mkdir -p $sysroot_output
-    rsync -abiuz  $compiler_rt_output/ $sysroot_output/
-    rsync -abiuz  $wasix_libc_output/ $sysroot_output/
-    rsync -abiuz  $libcxx_output/ $sysroot_output/
+    rsync -abuz  $compiler_rt_output/ $sysroot_output/
+    rsync -abuz  $wasix_libc_output/ $sysroot_output/
+    rsync -abuz  $libcxx_output/ $sysroot_output/
 }
 
 ### Run build steps

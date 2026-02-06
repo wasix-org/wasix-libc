@@ -28,18 +28,25 @@ jobs:
             build_script: ./build32.sh
             sysroot_dir: sysroot32
             artifact_name: wasix-sysroot
+    container:
+      image: archlinux:base-devel
+      options: --user root --workdir /
+    # steps:
+    #   - name: Update and install dependencies
+    #     run: |
+    #       sudo apt update
+    #       sudo apt install -y curl coreutils nodejs npm wget git cmake ninja-build llvm clang rsync make lld cargo python3 jq
+    #       # curl https://get.wasmer.io -sSfL | sh -s "prerelease"
     steps:
       - name: Update and install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y curl coreutils nodejs npm wget git cmake ninja-build llvm clang rsync make lld cargo python3 jq
+          pacman -Syu --noconfirm
+          pacman -Sy --noconfirm --needed curl coreutils nodejs npm wget git cmake ninja llvm clang rsync make lld cargo python3 jq
           # curl https://get.wasmer.io -sSfL | sh -s "prerelease"
-
       - name: Install wasixcc
         uses: wasix-org/wasixcc@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          sysroot-tag: v2025-12-22.1
 
       - name: Log tool versions
         run: |

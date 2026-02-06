@@ -18,12 +18,6 @@ case "${EH}-${PIC}" in
     *)       echo "Invalid EH/PIC combination: EH:${EH} PIC:${PIC}" ; exit 1 ;;
 esac
 
-if [ "$EH" = "ON" ]; then
-    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain
-else
-    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix.cmake_toolchain
-fi
-
 ### Path names of various build artifacts
 
 wasix_libc_output="build/wasix-libc-sysroot-$NAME"
@@ -40,9 +34,17 @@ sysroot_output="sysroot$NAME"
 
 ### Build settings
 
-export TARGET_ARCH=wasm32
-export TARGET_OS=wasix
+if [ "$EH" = "ON" ]; then
+    export WASIXCC_WASM_EXCEPTIONS=yes
+else
+    export WASIXCC_EXCEPTIONS=no
+fi
 
+if [ "$PIC" = "ON" ]; then
+    export WASIXCC_PIC=yes
+else
+    export WASIXCC_PIC=no
+fi
 
 ### Build steps
 
@@ -58,9 +60,6 @@ compiler_rt() {
 
     # Build the compiler runtime lib
     cmake \
-        -DCMAKE_SYSTEM_NAME=WASI \
-        -DCMAKE_SYSTEM_VERSION=1 \
-        -DCMAKE_SYSTEM_PROCESSOR=wasm32 \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_C_COMPILER_WORKS=ON \
         -DCMAKE_CXX_COMPILER_WORKS=ON \
@@ -87,7 +86,7 @@ compiler_rt() {
         -DCOMPILER_RT_HAS_FUNWIND_TABLES_FLAG=OFF \
         -DCMAKE_C_COMPILER_TARGET=wasm32-wasi \
         -DCOMPILER_RT_OS_DIR=wasm32-wasi \
-        -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
+        -DCMAKE_TOOLCHAIN_FILE="$REPO_ROOT"/tools/wasixcc.cmake \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$compiler_rt_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$compiler_rt_output \
         -DUNIX:BOOL=ON \
@@ -95,7 +94,7 @@ compiler_rt() {
         -S tools/llvm-project/compiler-rt
     cmake --build $compiler_rt_build_dir --parallel 16
     cmake --install $compiler_rt_build_dir
-    llvm-ranlib $compiler_rt_output/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a
+    wasixranlib $compiler_rt_output/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a
 }
 
 # Regenerate bindings in libc-bottom-half
@@ -139,7 +138,7 @@ wasix_libc() {
     rm -rf $wasix_libc_output
 
     # shellcheck disable=SC2086
-    CC=clang CXX=clang++ make CHECK_SYMBOLS="${CHECK_SYMBOLS:-yes}" -j 16 $MAKEFLAGS
+    TARGET_ARCH=wasm32 TARGET_OS=wasix CC=clang CXX=clang++ make CHECK_SYMBOLS="${CHECK_SYMBOLS:-yes}" -j 16 $MAKEFLAGS
     rm -f sysroot/lib/wasm32-wasi/libc-printscan-long-double.a
     rm -rf $wasix_libc_output
     mv sysroot $wasix_libc_output
@@ -166,7 +165,7 @@ libcxx() {
 
     cmake \
         -DCMAKE_POSITION_INDEPENDENT_CODE="$PIC" \
-        -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
+        -DCMAKE_TOOLCHAIN_FILE="$REPO_ROOT"/tools/wasixcc.cmake \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$libcxx_output \
         -DLIBCXX_ENABLE_THREADS:BOOL=ON \

@@ -3,16 +3,10 @@ set -Eeuxo pipefail
 
 ### Determine build configuration
 
-if [ "$PIC" = "ON" ]; then
-PIC=ON
-else
-PIC=OFF
-fi
-if [ "$EH" = "ON" ]; then
-EH=ON
-else
-EH=OFF
-fi
+EH=${EH:-OFF}
+if [ "$EH" != "ON" ]; then EH=OFF ; fi
+PIC=${PIC:-OFF}
+if [ "$PIC" != "ON" ]; then PIC=OFF ; fi
 
 REPO_ROOT="$(pwd)"
 

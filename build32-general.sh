@@ -94,7 +94,6 @@ compiler_rt() {
         -DCMAKE_C_COMPILER_TARGET=wasm32-wasi \
         -DCOMPILER_RT_OS_DIR=wasm32-wasi \
         -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
-        -DCMAKE_SYSTEM_NAME=WASI \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$compiler_rt_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$compiler_rt_output \
         -DUNIX:BOOL=ON \

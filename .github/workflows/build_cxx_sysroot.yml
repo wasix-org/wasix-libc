@@ -58,7 +58,7 @@ jobs:
           rm -rf /opt/wasix-sysroot
           mkdir /opt/wasix-sysroot
           ./build32-ehpic.sh
-          cp -r sysroot /opt/wasix-sysroot
+          cp -r sysroot32-ehpic /opt/wasix-sysroot/sysroot
 
       # - name: Run WASIX tests
       #   run: |
@@ -120,7 +120,7 @@ jobs:
           rm -rf /opt/wasix-sysroot
           mkdir /opt/wasix-sysroot
           ./build32-eh.sh
-          cp -r sysroot /opt/wasix-sysroot
+          cp -r sysroot32-eh /opt/wasix-sysroot/sysroot
 
       # - name: Run WASIX tests
       #   run: |
@@ -182,7 +182,7 @@ jobs:
           rm -rf /opt/wasix-sysroot
           mkdir /opt/wasix-sysroot
           ./build32.sh
-          cp -r sysroot /opt/wasix-sysroot
+          cp -r sysroot32 /opt/wasix-sysroot/sysroot
 
       # - name: Run WASIX tests
       #   run: |

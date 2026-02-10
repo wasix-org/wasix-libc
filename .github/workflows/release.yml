@@ -36,12 +36,26 @@ jobs:
           name: wasix-sysroot-ehpic
           path: wasix-sysroot-ehpic
 
+      - name: Download EH artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasix-sysroot-legacy-eh
+          path: wasix-sysroot-legacy-eh
+
+      - name: Download EHPIC artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasix-sysroot-legacy-ehpic
+          path: wasix-sysroot-legacy-ehpic
+
       - name: Create published artifacts
         run: |
           mkdir publish
           tar -czf publish/sysroot.tar.gz wasix-sysroot
           tar -czf publish/sysroot-eh.tar.gz wasix-sysroot-eh
           tar -czf publish/sysroot-ehpic.tar.gz wasix-sysroot-ehpic
+          tar -czf publish/sysroot-legacy-eh.tar.gz wasix-sysroot-legacy-eh
+          tar -czf publish/sysroot-legacy-ehpic.tar.gz wasix-sysroot-legacy-ehpic
 
       - name: Publish
         uses: "marvinpinto/action-automatic-releases@latest"

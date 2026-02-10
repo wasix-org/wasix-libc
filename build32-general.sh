@@ -19,7 +19,7 @@ case "${EH}-${PIC}-${LEGACY_EH}" in
     ON-OFF-ON)  NAME="32-legacy-eh" ;;
     OFF-ON-*)  echo "PIC is only supported when exception handling is enabled" ; exit 1 ;;
     OFF-OFF-OFF)  NAME="32" ;;
-    *)       echo "Invalid EH/PIC combination: EH:${EH} PIC:${PIC}" ; exit 1 ;;
+    *)       echo "Invalid EH/PIC/LEGACY_EH combination: EH:${EH} PIC:${PIC} LEGACY_EH:${LEGACY_EH}" ; exit 1 ;;
 esac
 
 if [ "$EH" = "ON" ]; then

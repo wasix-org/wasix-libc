@@ -13,19 +13,19 @@ if [ "$LEGACY_EH" != "ON" ]; then LEGACY_EH=OFF ; fi
 REPO_ROOT="$(pwd)"
 
 case "${EH}-${PIC}-${LEGACY_EH}" in
-    ON-ON-OFF)   NAME="32-ehpic" ;;
-    ON-OFF-OFF)  NAME="32-eh" ;;
-    ON-ON-ON)   NAME="32-legacy-ehpic" ;;
-    ON-OFF-ON)  NAME="32-legacy-eh" ;;
+    ON-ON-OFF)   NAME="32-exnref-ehpic" ;;
+    ON-OFF-OFF)  NAME="32-exnref-eh" ;;
+    ON-ON-ON)   NAME="32-ehpic" ;;
+    ON-OFF-ON)  NAME="32-eh" ;;
     OFF-ON-*)  echo "PIC is only supported when exception handling is enabled" ; exit 1 ;;
     OFF-OFF-OFF)  NAME="32" ;;
     *)       echo "Invalid EH/PIC/LEGACY_EH combination: EH:${EH} PIC:${PIC} LEGACY_EH:${LEGACY_EH}" ; exit 1 ;;
 esac
 
 if [ "$EH" = "ON" ]; then
-    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain
+    CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-exnref-eh.cmake_toolchain
     if [ "$LEGACY_EH" = "ON" ]; then
-        CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-legacy-eh.cmake_toolchain
+        CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain
     fi
 else
     CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix.cmake_toolchain

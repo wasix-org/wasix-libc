@@ -19,10 +19,10 @@ jobs:
       matrix:
         include:
           - variant: ""
+          - variant: "-exnref-eh"
+          - variant: "-exnref-ehpic"
           - variant: "-eh"
           - variant: "-ehpic"
-          - variant: "-legacy-eh"
-          - variant: "-legacy-ehpic"
     container:
       image: archlinux:base-devel
       options: --user root --workdir /

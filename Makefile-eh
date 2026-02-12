@@ -24,7 +24,7 @@ OBJDIR ?= build/$(TARGET_TRIPLE)
 # Whether to compile with PIC (needed for shared libs and dynamic linking)
 PIC ?= no
 # Use legacy exception handling instead of the standardized exnref based one. 
-LEGACY_EH ?= no
+EXNREF_EH ?= yes
 # Whether to verify the build symbols against the expected symbol list.
 # Disabling this is useful for development, where differences in the
 # exact version of clang can cause some symbols (especially macros) to
@@ -410,11 +410,12 @@ CFLAGS += -Wall -Wextra -Werror \
  -Wno-unknown-warning-option \
  -Wno-unused-command-line-argument
 
-ifeq ($(LEGACY_EH), yes)
-# Use Wasm EH instead of legacy EH.
-CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
+ifeq ($(EXNREF_EH), yes)
+    # Use wasm 3.0 exnref exception handling
+    CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj -mllvm --wasm-enable-eh -Wl,-mllvm,--wasm-enable-eh -mllvm --wasm-use-legacy-eh=false -Wl,-mllvm,--wasm-use-legacy-eh=false -Wl,-mllvm,--exception-model=wasm
 else
-CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj -mllvm --wasm-enable-eh -Wl,-mllvm,--wasm-enable-eh -mllvm --wasm-use-legacy-eh=false -Wl,-mllvm,--wasm-use-legacy-eh=false -Wl,-mllvm,--exception-model=wasm
+    # Use legacy exception handling
+    CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
 endif
 
 # Configure support for threads.

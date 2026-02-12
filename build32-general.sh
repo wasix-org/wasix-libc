@@ -7,24 +7,24 @@ EH=${EH:-OFF}
 if [ "$EH" != "ON" ]; then EH=OFF ; fi
 PIC=${PIC:-OFF}
 if [ "$PIC" != "ON" ]; then PIC=OFF ; fi
-LEGACY_EH=${LEGACY_EH:-OFF}
-if [ "$LEGACY_EH" != "ON" ]; then LEGACY_EH=OFF ; fi
+EXNREF_EH=${EXNREF_EH:-ON}
+if [ "$EXNREF_EH" != "OFF" ]; then EXNREF_EH=ON ; fi
 
 REPO_ROOT="$(pwd)"
 
-case "${EH}-${PIC}-${LEGACY_EH}" in
-    ON-ON-OFF)   NAME="32-exnref-ehpic" ;;
-    ON-OFF-OFF)  NAME="32-exnref-eh" ;;
-    ON-ON-ON)   NAME="32-ehpic" ;;
-    ON-OFF-ON)  NAME="32-eh" ;;
+case "${EH}-${PIC}-${EXNREF_EH}" in
+    ON-ON-ON)   NAME="32-exnref-ehpic" ;;
+    ON-OFF-ON)  NAME="32-exnref-eh" ;;
+    ON-ON-OFF)   NAME="32-ehpic" ;;
+    ON-OFF-OFF)  NAME="32-eh" ;;
     OFF-ON-*)  echo "PIC is only supported when exception handling is enabled" ; exit 1 ;;
-    OFF-OFF-OFF)  NAME="32" ;;
-    *)       echo "Invalid EH/PIC/LEGACY_EH combination: EH:${EH} PIC:${PIC} LEGACY_EH:${LEGACY_EH}" ; exit 1 ;;
+    OFF-OFF-ON)  NAME="32" ;;
+    *)       echo "Invalid EH/PIC/EXNREF_EH combination: EH:${EH} PIC:${PIC} EXNREF_EH:${EXNREF_EH}" ; exit 1 ;;
 esac
 
 if [ "$EH" = "ON" ]; then
     CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-exnref-eh.cmake_toolchain
-    if [ "$LEGACY_EH" = "ON" ]; then
+    if [ "$EXNREF_EH" = "OFF" ]; then
         CMAKE_TOOLCHAIN="$REPO_ROOT"/tools/clang-wasix-eh.cmake_toolchain
     fi
 else
@@ -136,10 +136,10 @@ wasix_libc() {
     fi
     if [ "$EH" = "ON" ]; then
             MAKEFLAGS="$MAKEFLAGS -f Makefile-eh"
-        if [ "$LEGACY_EH" = "ON" ]; then
-            MAKEFLAGS="$MAKEFLAGS LEGACY_EH=yes"
+        if [ "$EXNREF_EH" = "ON" ]; then
+            MAKEFLAGS="$MAKEFLAGS EXNREF_EH=yes"
         else
-            MAKEFLAGS="$MAKEFLAGS LEGACY_EH=no"
+            MAKEFLAGS="$MAKEFLAGS EXNREF_EH=no"
         fi
     else
         MAKEFLAGS="$MAKEFLAGS -f Makefile"

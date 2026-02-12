@@ -135,7 +135,7 @@ wasix_libc() {
         MAKEFLAGS="$MAKEFLAGS PIC=no"
     fi
     if [ "$EH" = "ON" ]; then
-            MAKEFLAGS="$MAKEFLAGS -f Makefile-eh"
+        MAKEFLAGS="$MAKEFLAGS -f Makefile-eh"
         if [ "$EXNREF_EH" = "ON" ]; then
             MAKEFLAGS="$MAKEFLAGS EXNREF_EH=yes"
         else

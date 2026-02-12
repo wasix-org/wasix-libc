@@ -23,7 +23,7 @@ BUILD_LIBC_TOP_HALF ?= yes
 OBJDIR ?= build/$(TARGET_TRIPLE)
 # Whether to compile with PIC (needed for shared libs and dynamic linking)
 PIC ?= no
-# Use legacy exception handling instead of the standardized exnref based one. 
+# Use the standardized exnref-based exception handling instead of the legacy one.
 EXNREF_EH ?= yes
 # Whether to verify the build symbols against the expected symbol list.
 # Disabling this is useful for development, where differences in the

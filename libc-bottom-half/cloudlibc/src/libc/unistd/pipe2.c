@@ -1,6 +1,7 @@
 #include <wasi/api.h>
 #include <wasi/libc.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 int pipe2(int fd[2], int flag)
@@ -12,7 +13,28 @@ int pipe2(int fd[2], int flag)
         errno = error;
         return -1;
     }
-	fd[0] = fd1;
+
+    // Set flags if requested
+    if (flag & O_CLOEXEC) {
+        if (fcntl(fd1, F_SETFD, FD_CLOEXEC) < 0 || fcntl(fd2, F_SETFD, FD_CLOEXEC) < 0) {
+            int saved_errno = errno;
+            close(fd1);
+            close(fd2);
+            errno = saved_errno;
+            return -1;
+        }
+    }
+    if (flag & O_NONBLOCK) {
+        if (fcntl(fd1, F_SETFL, O_NONBLOCK) < 0 || fcntl(fd2, F_SETFL, O_NONBLOCK) < 0) {
+            int saved_errno = errno;
+            close(fd1);
+            close(fd2);
+            errno = saved_errno;
+            return -1;
+        }
+    }
+
+    fd[0] = fd1;
 	fd[1] = fd2;
     return 0;
 }

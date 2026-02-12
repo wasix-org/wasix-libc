@@ -25,7 +25,17 @@ int pipe2(int fd[2], int flag)
         }
     }
     if (flag & O_NONBLOCK) {
-        if (fcntl(fd1, F_SETFL, O_NONBLOCK) < 0 || fcntl(fd2, F_SETFL, O_NONBLOCK) < 0) {
+        int flags1 = fcntl(fd1, F_GETFL);
+        int flags2 = fcntl(fd2, F_GETFL);
+        if (flags1 < 0 || flags2 < 0) {
+            int saved_errno = errno;
+            close(fd1);
+            close(fd2);
+            errno = saved_errno;
+            return -1;
+        }
+        if (fcntl(fd1, F_SETFL, flags1 | O_NONBLOCK) < 0 ||
+            fcntl(fd2, F_SETFL, flags2 | O_NONBLOCK) < 0) {
             int saved_errno = errno;
             close(fd1);
             close(fd2);

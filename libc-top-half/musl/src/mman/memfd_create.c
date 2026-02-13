@@ -23,13 +23,6 @@ static int create_unlinked_temp(char *template_path, unsigned int flags)
 		return -1;
 	}
 
-	if ((flags & MFD_CLOEXEC) && fcntl(fd, F_SETFD, FD_CLOEXEC) != 0) {
-		int saved_errno = errno;
-		close(fd);
-		errno = saved_errno;
-		return -1;
-	}
-
 	return fd;
 }
 
@@ -37,7 +30,12 @@ int memfd_create(const char *name, unsigned int flags)
 {
 	(void)name;
 
-	if (flags & ~(MFD_CLOEXEC | MFD_ALLOW_SEALING)) {
+	if (flags & MFD_HUGETLB) {
+		errno = ENOTSUP;
+		return -1;
+	}
+
+	if (flags & ~(MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB)) {
 		errno = EINVAL;
 		return -1;
 	}

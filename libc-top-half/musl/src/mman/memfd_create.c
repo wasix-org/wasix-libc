@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -72,7 +71,7 @@ int memfd_create(const char *name, unsigned int flags)
 
 	// Construct a string like "/tmp/.memfd-<name>-XXXXXX"
 	char tmp_template[sizeof("/tmp/.memfd-")-1 + MEMFD_NAME_MAX + sizeof("-XXXXXX")-1 + 1];
-	memcpy(tmp_template, "/tmp/.memfd-", sizeof("/tmp/.memfd-"));
+	memcpy(tmp_template, "/tmp/.memfd-", sizeof("/tmp/.memfd-") -1);
 	int name_len = sanitize_name(tmp_template + sizeof("/tmp/.memfd-") - 1, MEMFD_NAME_MAX + 1, name);
 	if (name_len > MEMFD_NAME_MAX) {
 		errno = EINVAL;

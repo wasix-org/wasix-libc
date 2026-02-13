@@ -118,7 +118,7 @@ analyze_wasm_file() {
     # Count legacy EH instructions (unique to legacy EH)
     # "try" without "_table" suffix is the key indicator of legacy EH
     # In legacy EH, try/catch/catch_all are standalone block instructions
-    legacy_try=$(echo "$wat_output" | grep -cE '^\s*try\s+;;' || true)
+    legacy_try=$(echo "$wat_output" | grep -cE '^\s*try\s' || true)
     
     # These are informational - they exist in both but structured differently
     legacy_catch=$(echo "$wat_output" | grep -cE '^\s*catch\s' || true)

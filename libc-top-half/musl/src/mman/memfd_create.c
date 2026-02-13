@@ -82,7 +82,8 @@ int memfd_create(const char *name, unsigned int flags)
 	int fd = create_unlinked_temp(tmp_template, flags);
 	if (fd >= 0) return fd;
 
-	// Use ".memfd-<name>-XXXXXX" to create a temporary file in the current working directory.
-	char* cwd_name = tmp_template + sizeof("/tmp/") - 1;
-	return create_unlinked_temp(cwd_name, flags);
+	// If that failed, try ".memfd-<name>-XXXXXX" in the current working directory.
+	// Restore the -XXXXXX placeholder because it got overwritten by the previous call to mkstemp.
+	memcpy(tmp_template + sizeof("/tmp/.memfd-") - 1 + name_len, "-XXXXXX", sizeof("-XXXXXX"));
+	return create_unlinked_temp(tmp_template + sizeof("/tmp/") - 1, flags);
 }

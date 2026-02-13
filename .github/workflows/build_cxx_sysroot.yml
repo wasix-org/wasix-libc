@@ -12,132 +12,17 @@ permissions:
   checks: write
 
 jobs:
-  build_cxx_sysroot_ehpic:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux:base-devel
-      options: --user root --workdir /
-    steps:
-      - name: Update and install dependencies
-        run: |
-          pacman -Syu --noconfirm
-          pacman -Sy --noconfirm --needed coreutils nodejs npm wget git cmake ninja llvm clang rsync make lld cargo python3 jq
-          # curl https://get.wasmer.io -sSfL | sh -s "prerelease"
-
-      - name: Log tool versions
-        run: |
-          echo git
-          git --version
-          echo "##########################"
-          # echo wasmer
-          # wasmer -V
-          # echo "##########################"
-          echo clang
-          clang -v
-          echo "##########################"
-          echo llvm-ar
-          llvm-ar -V
-          echo "##########################"
-          echo llvm-nm
-          llvm-nm -V
-          echo "##########################"
-          echo nodejs
-          node -v
-          echo "##########################"
-          echo npm
-          npm -v
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Build
-        run: |
-          git config --global --add safe.directory $(pwd)
-          rm -rf /opt/wasix-sysroot
-          mkdir /opt/wasix-sysroot
-          ./build32-ehpic.sh
-          cp -r sysroot32-ehpic /opt/wasix-sysroot/sysroot
-
-      # - name: Run WASIX tests
-      #   run: |
-      #     export CLANG_VERSION=$(clang --version | grep -i "clang version" | sed -n 's/.*version \([0-9.]*\).*/\1/p')
-      #     echo Detected clang version $CLANG_VERSION
-      #     mkdir -p /usr/lib/clang/19/lib/wasm32-wasmer-wasi
-      #     cp /opt/wasix-sysroot/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a /usr/lib/clang/19/lib/wasm32-wasmer-wasi/libclang_rt.builtins.a
-      #     TOOLCHAIN=/opt/wasix-sysroot/clang-wasix.cmake_toolchain ./test/wasix/run_tests.sh
-
-      - name: Upload sysroot
-        uses: actions/upload-artifact@v4
-        with:
-          name: wasix-sysroot-ehpic
-          path: /opt/wasix-sysroot
-
-  build_cxx_sysroot_eh:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux:base-devel
-      options: --user root --workdir /
-    steps:
-      - name: Update and install dependencies
-        run: |
-          pacman -Syu --noconfirm
-          pacman -Sy --noconfirm --needed coreutils nodejs npm wget git cmake ninja llvm clang rsync make lld cargo python3 jq
-          # curl https://get.wasmer.io -sSfL | sh -s "prerelease"
-
-      - name: Log tool versions
-        run: |
-          echo git
-          git --version
-          echo "##########################"
-          # echo wasmer
-          # wasmer -V
-          # echo "##########################"
-          echo clang
-          clang -v
-          echo "##########################"
-          echo llvm-ar
-          llvm-ar -V
-          echo "##########################"
-          echo llvm-nm
-          llvm-nm -V
-          echo "##########################"
-          echo nodejs
-          node -v
-          echo "##########################"
-          echo npm
-          npm -v
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Build
-        run: |
-          git config --global --add safe.directory $(pwd)
-          rm -rf /opt/wasix-sysroot
-          mkdir /opt/wasix-sysroot
-          ./build32-eh.sh
-          cp -r sysroot32-eh /opt/wasix-sysroot/sysroot
-
-      # - name: Run WASIX tests
-      #   run: |
-      #     export CLANG_VERSION=$(clang --version | grep -i "clang version" | sed -n 's/.*version \([0-9.]*\).*/\1/p')
-      #     echo Detected clang version $CLANG_VERSION
-      #     mkdir -p /usr/lib/clang/19/lib/wasm32-wasmer-wasi
-      #     cp /opt/wasix-sysroot/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a /usr/lib/clang/19/lib/wasm32-wasmer-wasi/libclang_rt.builtins.a
-      #     TOOLCHAIN=/opt/wasix-sysroot/clang-wasix.cmake_toolchain ./test/wasix/run_tests.sh
-
-      - name: Upload sysroot
-        uses: actions/upload-artifact@v4
-        with:
-          name: wasix-sysroot-eh
-          path: /opt/wasix-sysroot
-
   build_cxx_sysroot:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: ""
+          - variant: "-exnref-eh"
+          - variant: "-exnref-ehpic"
+          - variant: "-eh"
+          - variant: "-ehpic"
     container:
       image: archlinux:base-devel
       options: --user root --workdir /
@@ -152,10 +37,10 @@ jobs:
         run: |
           echo git
           git --version
-          # echo "##########################"
+          echo "##########################"
           # echo wasmer
           # wasmer -V
-          echo "##########################"
+          # echo "##########################"
           echo clang
           clang -v
           echo "##########################"
@@ -181,8 +66,8 @@ jobs:
           git config --global --add safe.directory $(pwd)
           rm -rf /opt/wasix-sysroot
           mkdir /opt/wasix-sysroot
-          ./build32.sh
-          cp -r sysroot32 /opt/wasix-sysroot/sysroot
+          ./build32${{ matrix.variant }}.sh
+          cp -r sysroot32${{ matrix.variant }} /opt/wasix-sysroot/sysroot
 
       # - name: Run WASIX tests
       #   run: |
@@ -195,5 +80,5 @@ jobs:
       - name: Upload sysroot
         uses: actions/upload-artifact@v4
         with:
-          name: wasix-sysroot
+          name: wasix-sysroot${{ matrix.variant }}
           path: /opt/wasix-sysroot

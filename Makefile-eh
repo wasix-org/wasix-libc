@@ -23,6 +23,8 @@ BUILD_LIBC_TOP_HALF ?= yes
 OBJDIR ?= build/$(TARGET_TRIPLE)
 # Whether to compile with PIC (needed for shared libs and dynamic linking)
 PIC ?= no
+# Use the standardized exnref-based exception handling instead of the legacy one.
+EXNREF_EH ?= yes
 # Whether to verify the build symbols against the expected symbol list.
 # Disabling this is useful for development, where differences in the
 # exact version of clang can cause some symbols (especially macros) to
@@ -392,7 +394,7 @@ CFLAGS += --target=$(TARGET_TRIPLE)
 ASMFLAGS += --target=$(TARGET_TRIPLE)
 # WebAssembly floating-point match doesn't trap.
 # TODO: Add -fno-signaling-nans when the compiler supports it.
-CFLAGS += -fno-trapping-math  -fwasm-exceptions
+CFLAGS += -fno-trapping-math
 # Add all warnings, but disable a few which occur in third-party code.
 CFLAGS += -Wall -Wextra -Werror \
  -Wno-incompatible-function-pointer-types \
@@ -408,6 +410,14 @@ CFLAGS += -Wall -Wextra -Werror \
  -Wno-unknown-warning-option \
  -Wno-unused-command-line-argument
 
+ifeq ($(EXNREF_EH), yes)
+    # Use wasm 3.0 exnref exception handling
+    CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj -mllvm --wasm-enable-eh -Wl,-mllvm,--wasm-enable-eh -mllvm --wasm-use-legacy-eh=false -Wl,-mllvm,--wasm-use-legacy-eh=false -Wl,-mllvm,--exception-model=wasm
+else
+    # Use legacy exception handling
+    CFLAGS += -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
+endif
+
 # Configure support for threads.
 ifeq ($(THREAD_MODEL), single)
 CFLAGS += -mthread-model single
@@ -415,7 +425,7 @@ endif
 ifeq ($(THREAD_MODEL), posix)
 # Specify the tls-model until LLVM 15 is released (which should contain
 # https://reviews.llvm.org/D130053).
-CFLAGS += -mthread-model posix -pthread -ftls-model=local-exec -mexception-handling -fwasm-exceptions -mllvm --wasm-enable-sjlj -Wl,-mllvm,--wasm-enable-sjlj
+CFLAGS += -mthread-model posix -pthread -ftls-model=local-exec
 
 # Include cloudlib's directory to access the structure definition of clockid_t
 CFLAGS += -I$(LIBC_BOTTOM_HALF_CLOUDLIBC_SRC)

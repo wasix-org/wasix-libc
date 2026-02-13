@@ -27,6 +27,18 @@ jobs:
       - name: Download EH artifacts
         uses: actions/download-artifact@v4
         with:
+          name: wasix-sysroot-exnref-eh
+          path: wasix-sysroot-exnref-eh
+
+      - name: Download EHPIC artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasix-sysroot-exnref-ehpic
+          path: wasix-sysroot-exnref-ehpic
+
+      - name: Download EH artifacts
+        uses: actions/download-artifact@v4
+        with:
           name: wasix-sysroot-eh
           path: wasix-sysroot-eh
 
@@ -40,6 +52,8 @@ jobs:
         run: |
           mkdir publish
           tar -czf publish/sysroot.tar.gz wasix-sysroot
+          tar -czf publish/sysroot-exnref-eh.tar.gz wasix-sysroot-exnref-eh
+          tar -czf publish/sysroot-exnref-ehpic.tar.gz wasix-sysroot-exnref-ehpic
           tar -czf publish/sysroot-eh.tar.gz wasix-sysroot-eh
           tar -czf publish/sysroot-ehpic.tar.gz wasix-sysroot-ehpic
 

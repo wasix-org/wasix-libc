@@ -30,9 +30,9 @@ static int create_unlinked_temp(char *template_path, unsigned int flags) {
   return fd;
 }
 
-// Returns the length of the name without the null character.
-// If the returned length == dst_len, the src was too long. dst is not null
-// terminated in this case.
+// Returns the number of characters copied, excluding any null terminator.
+// If the returned length == dst_len, src contained at least dst_len
+// non-null characters and dst is not null-terminated (no room for a terminator).
 static int sanitize_name(char *dst, size_t dst_len, const char *src) {
   size_t i = 0;
 

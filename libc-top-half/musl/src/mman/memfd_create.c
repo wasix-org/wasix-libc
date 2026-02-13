@@ -47,11 +47,6 @@ static int sanitize_name(char *dst, size_t dst_len, const char *src)
 		i++;
 	}
 
-	if (i == 0 && dst_len > 1) {
-		strcpy(dst, "anon");
-		return 4;
-	}
-
 	return i;
 }
 

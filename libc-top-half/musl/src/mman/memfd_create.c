@@ -30,18 +30,14 @@ int memfd_create(const char *name, unsigned int flags)
 {
 	(void)name;
 
-	if (flags & MFD_HUGETLB) {
-		errno = ENOTSUP;
-		return -1;
-	}
-
 	if (flags & ~(MFD_CLOEXEC | MFD_ALLOW_SEALING | MFD_HUGETLB)) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	/* Seals are not currently supported by the WASIX fcntl subset. */
-	if (flags & MFD_ALLOW_SEALING) {
+	if (flags & (MFD_HUGETLB | MFD_ALLOW_SEALING)) {
+		/* Seals are not currently supported by the WASIX fcntl subset. */
+		/* hugetlbfs is not currently supported by the WASIX filesystem subset. */
 		errno = ENOTSUP;
 		return -1;
 	}

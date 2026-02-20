@@ -1,6 +1,9 @@
 #!/bin/bash
+BACKEND_FLAG=${WASMER_BACKEND_FLAG:---llvm}
 
-wasmer run --verbose --enable-all ./main
+WASMER_BIN=${WASMER_BIN:-wasmer}
+
+$WASMER_BIN run --verbose $BACKEND_FLAG ./main
 RESULT=$?
 if [ "$RESULT" != "123" ]; then
     echo "Test failed: different exit code ($RESULT vs. 123)" > /dev/stderr

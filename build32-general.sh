@@ -61,6 +61,7 @@ compiler_rt() {
 
     # Empty sysroot for the build
     mkdir -p $compiler_rt_build_sysroot
+    rsync -abuz  $wasix_libc_output/ $compiler_rt_build_sysroot/
     export WASIXCC_SYSROOT="$REPO_ROOT"/$compiler_rt_build_sysroot
 
     # Build the compiler runtime lib
@@ -232,12 +233,12 @@ sysroot() {
 
 ### Run build steps
 
-# Build compiler rt
-compiler_rt
 # Generate files in wasix-libc
 prepare_wasix_libc
 # Build wasix-libc
 wasix_libc
+# Build compiler rt
+compiler_rt
 # Build C++ sysroot
 libcxx
 # Combine libcxx, wasix-libc and compiler-rt into one

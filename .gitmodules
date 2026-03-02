@@ -7,3 +7,6 @@
 [submodule "tools/llvm-project"]
 	path = tools/llvm-project
 	url = https://github.com/llvm/llvm-project.git
+[submodule "mimalloc"]
+	path = mimalloc
+	url = https://github.com/microsoft/mimalloc.git

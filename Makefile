@@ -15,8 +15,8 @@ SYSROOT ?= $(CURDIR)/sysroot
 INSTALL_DIR ?= /usr/local
 # single or posix; note that pthread support is still a work-in-progress.
 THREAD_MODEL ?= posix
-# dlmalloc or none
-MALLOC_IMPL ?= dlmalloc
+# dlmalloc, emmalloc, mimalloc, or none
+MALLOC_IMPL ?= mimalloc
 # yes or no
 BUILD_LIBC_TOP_HALF ?= yes
 # The directory where we will store intermediate artifacts.
@@ -53,6 +53,11 @@ DLMALLOC_SOURCES = $(DLMALLOC_SRC_DIR)/dlmalloc.c
 DLMALLOC_INC = $(DLMALLOC_DIR)/include
 EMMALLOC_DIR = emmalloc
 EMMALLOC_SOURCES = $(EMMALLOC_DIR)/emmalloc.c
+MIMALLOC_DIR = mimalloc
+MIMALLOC_BUILD_DIR = $(OBJDIR)/mimalloc
+MIMALLOC_STATIC_LIB = $(MIMALLOC_BUILD_DIR)/libmimalloc.a
+MIMALLOC_EXTRACT_DIR = $(MIMALLOC_BUILD_DIR)/extract
+MIMALLOC_EXTRACT_STAMP = $(MIMALLOC_EXTRACT_DIR)/.extract.stamp
 LIBC_BOTTOM_HALF_DIR = libc-bottom-half
 LIBC_BOTTOM_HALF_CLOUDLIBC_SRC = $(LIBC_BOTTOM_HALF_DIR)/cloudlibc/src
 LIBC_BOTTOM_HALF_CLOUDLIBC_SRC_INC = $(LIBC_BOTTOM_HALF_CLOUDLIBC_SRC)/include
@@ -439,6 +444,8 @@ ifeq ($(MALLOC_IMPL),dlmalloc)
 LIBC_OBJS += $(DLMALLOC_OBJS)
 else ifeq ($(MALLOC_IMPL),emmalloc)
 LIBC_OBJS += $(EMMALLOC_OBJS)
+else ifeq ($(MALLOC_IMPL),mimalloc)
+LIBC_OBJS += $(MIMALLOC_EXTRACT_STAMP)
 else ifeq ($(MALLOC_IMPL),none)
 # No object files to add.
 else
@@ -552,7 +559,13 @@ wasix-headers:
 post-finish: finish
 	rm -f sysroot/lib/wasm32-wasi/libc-printscan-log-double.a
 
+ifeq ($(MALLOC_IMPL),mimalloc)
 $(SYSROOT_LIB)/libc.a: $(LIBC_OBJS)
+	@mkdir -p "$(@D)"
+	$(AR) crs $@ $(sort $(filter %.o,$^) $(wildcard $(MIMALLOC_EXTRACT_DIR)/*.o))
+else
+$(SYSROOT_LIB)/libc.a: $(LIBC_OBJS)
+endif
 
 $(SYSROOT_LIB)/libc-printscan-long-double.a: $(MUSL_PRINTSCAN_LONG_DOUBLE_OBJS)
 
@@ -580,6 +593,36 @@ endif
 	# This might eventually overflow again, but at least it'll do so in a loud way instead of
 	# silently dropping the tail.
 	$(AR) crs $@ $(wordlist 800, 100000, $(sort $^))
+
+MIMALLOC_CFLAGS = --target=$(TARGET_TRIPLE) -mthread-model $(THREAD_MODEL)
+MIMALLOC_AR = $(shell command -v $(firstword $(AR)) 2>/dev/null || echo $(firstword $(AR)))
+MIMALLOC_CFLAGS += -isystem $(SYSROOT_INC)
+ifeq ($(THREAD_MODEL), posix)
+MIMALLOC_CFLAGS += -pthread
+endif
+ifeq ($(PIC), yes)
+MIMALLOC_CFLAGS += -fPIC
+endif
+
+$(MIMALLOC_BUILD_DIR)/Makefile:
+	@mkdir -p "$(MIMALLOC_BUILD_DIR)"
+	cmake -S "$(MIMALLOC_DIR)" -B "$(MIMALLOC_BUILD_DIR)" \
+	    -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+	    -DCMAKE_C_COMPILER="$(CC)" \
+	    -DCMAKE_AR="$(MIMALLOC_AR)" \
+	    -DCMAKE_C_FLAGS="$(MIMALLOC_CFLAGS)" \
+	    -DMI_BUILD_SHARED=OFF \
+	    -DMI_BUILD_TESTS=OFF \
+	    -DMI_USE_CXX=OFF
+
+$(MIMALLOC_STATIC_LIB): include_dirs $(MIMALLOC_BUILD_DIR)/Makefile
+	cmake --build "$(MIMALLOC_BUILD_DIR)" --target mimalloc-static -v
+
+$(MIMALLOC_EXTRACT_STAMP): $(MIMALLOC_STATIC_LIB)
+	rm -rf "$(MIMALLOC_EXTRACT_DIR)"
+	mkdir -p "$(MIMALLOC_EXTRACT_DIR)"
+	cd "$(MIMALLOC_EXTRACT_DIR)" && "$(AR)" x "$(abspath $(MIMALLOC_STATIC_LIB))"
+	touch "$@"
 
 $(MUSL_PRINTSCAN_OBJS): CFLAGS += \
 	    -D__wasilibc_printscan_full_support_option="\"add -lc-printscan-long-double to the link command\""
@@ -691,10 +734,16 @@ finish: startup_files libc
 	# The build succeeded! The generated sysroot is in $(SYSROOT).
 	#
 
-# The check for defined and undefined symbols expects there to be a heap
-# alloctor (providing malloc, calloc, free, etc). Skip this step if the build
-# is done without a malloc implementation.
-ifneq ($(MALLOC_IMPL),none)
+# The check for defined and undefined symbols compares against symbol snapshots
+# in expected/$(TARGET_TRIPLE). Since those snapshots are allocator-specific and
+# currently track the default allocators, skip this check for unsupported ones
+# (for example mimalloc) and for builds without a malloc implementation.
+ifeq ($(MALLOC_IMPL),dlmalloc)
+ifneq ($(CHECK_SYMBOLS),no)
+finish: check-symbols
+endif
+endif
+ifeq ($(MALLOC_IMPL),emmalloc)
 ifneq ($(CHECK_SYMBOLS),no)
 finish: check-symbols
 endif

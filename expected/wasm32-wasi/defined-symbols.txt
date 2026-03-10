@@ -1209,6 +1209,7 @@ memccpy
 memchr
 memcmp
 memcpy
+memfd_create
 memmem
 memmove
 mempcpy

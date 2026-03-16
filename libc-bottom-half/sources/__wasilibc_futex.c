@@ -12,9 +12,9 @@ int __wasilibc_futex_wait_wasix(volatile void *addr, int op, int expected, int64
   __wasi_bool_t woken = __WASI_BOOL_FALSE;
   
   __wasi_option_timestamp_t timeout;
-  if (max_wait_ns > 0) {
+  if (max_wait_ns >= 0) {
     timeout.tag = __WASI_OPTION_SOME;
-    timeout.u.none = max_wait_ns;
+    timeout.u.some = max_wait_ns;
   } else {
     timeout.tag = __WASI_OPTION_NONE;
     timeout.u.none = 0;

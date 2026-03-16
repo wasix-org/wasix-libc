@@ -3841,20 +3841,32 @@ typedef uint64_t __wasi_context_id_t;
 _Static_assert(sizeof(__wasi_context_id_t) == 8, "witx calculated size");
 _Static_assert(_Alignof(__wasi_context_id_t) == 8, "witx calculated align");
 
-/**
- * Signal action.
- */
-typedef struct __wasi_itimerval_t {
+typedef struct __wasi_timeval_t {
     __wasi_timestamp_t tv_sec;
 
     __wasi_timestamp_t tv_usec;
 
+} __wasi_timeval_t;
+
+_Static_assert(sizeof(__wasi_timeval_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_timeval_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_timeval_t, tv_sec) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_timeval_t, tv_usec) == 8, "witx calculated offset");
+
+/**
+ * Signal action.
+ */
+typedef struct __wasi_itimerval_t {
+    __wasi_timeval_t it_interval;
+
+    __wasi_timeval_t it_value;
+
 } __wasi_itimerval_t;
 
-_Static_assert(sizeof(__wasi_itimerval_t) == 16, "witx calculated size");
+_Static_assert(sizeof(__wasi_itimerval_t) == 32, "witx calculated size");
 _Static_assert(_Alignof(__wasi_itimerval_t) == 8, "witx calculated align");
-_Static_assert(offsetof(__wasi_itimerval_t, tv_sec) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_itimerval_t, tv_usec) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_itimerval_t, it_interval) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_itimerval_t, it_value) == 16, "witx calculated offset");
 
 /**
  * @defgroup wasix_32v1

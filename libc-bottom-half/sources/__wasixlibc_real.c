@@ -355,6 +355,20 @@ __wasi_errno_t __wasi_proc_raise_interval(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_proc_raise_interval2(int32_t arg0, int32_t arg1, int32_t arg2) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("proc_raise_interval2")
+));
+
+__wasi_errno_t __wasi_proc_raise_interval2(
+    __wasi_signal_t sig,
+    const __wasi_itimerval_t * now,
+    __wasi_itimerval_t *retptr0
+){
+    int32_t ret = __imported_wasix_32v1_proc_raise_interval2((int32_t) sig, (int32_t) now, (intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+
 int32_t __imported_wasix_32v1_proc_fork(int32_t arg0, int32_t arg1) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("proc_fork")

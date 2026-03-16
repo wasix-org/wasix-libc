@@ -43,6 +43,11 @@ int setgroups(size_t count, const gid_t list[])
 	__synccall(do_setgroups, &c);
 	return __syscall_ret(c.ret);
 #else
+  /* WASIX does not currently support supplementary groups.
+   * Allow clearing the list as a no-op for compatibility. */
+  if (count == 0) {
+    return 0;
+  }
   errno = ENOTSUP;
   return -1;
 #endif

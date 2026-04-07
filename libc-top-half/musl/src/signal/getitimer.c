@@ -1,8 +1,6 @@
 #include <sys/time.h>
 #include <errno.h>
-#ifdef __wasilibc_unmodified_upstream
 #include "syscall.h"
-#endif
 
 int getitimer(int which, struct itimerval *old)
 {
@@ -20,6 +18,8 @@ int getitimer(int which, struct itimerval *old)
 	}
 	return syscall(SYS_getitimer, which, old);
 #else
-	return EINVAL;
+	(void)which;
+	(void)old;
+	return __syscall_ret(-EINVAL);
 #endif
 }

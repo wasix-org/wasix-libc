@@ -1,8 +1,7 @@
 #include <signal.h>
 #include <stdint.h>
-#ifdef __wasilibc_unmodified_upstream
 #include "syscall.h"
-#else
+#ifndef __wasilibc_unmodified_upstream
 #include <wasi/api.h>
 #endif
 #include "pthread_impl.h"
@@ -21,5 +20,5 @@ int raise(int sig)
 #ifdef __wasilibc_unmodified_upstream
 	__restore_sigs(&set);
 #endif
-	return ret;
+	return __syscall_ret(-ret);
 }

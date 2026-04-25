@@ -30,17 +30,31 @@ jobs:
       - name: Update and install dependencies
         run: |
           pacman -Syu --noconfirm
-          pacman -Sy --noconfirm --needed coreutils nodejs npm wget git cmake ninja llvm clang rsync make lld cargo python3 jq
+          # Removed llvm, clang, and lld from pacman to prevent conflicts with the pinned version
+          pacman -Sy --noconfirm --needed coreutils nodejs npm wget git cmake ninja rsync make cargo python3 jq
           # curl https://get.wasmer.io -sSfL | sh -s "prerelease"
+
+      - name: Install LLVM/Clang 21.1.8
+        run: |
+          # Download the correct Linux X64 release from your list
+          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/LLVM-21.1.8-Linux-X64.tar.xz
+          
+          # Create target directory and extract, stripping the top-level folder
+          mkdir -p /opt/llvm-21.1.8
+          tar -xf LLVM-21.1.8-Linux-X64.tar.xz -C /opt/llvm-21.1.8 --strip-components=1
+          
+          # Symlink standard 'ar' and 'nm' to the LLVM tools
+          ln -s /opt/llvm-21.1.8/bin/llvm-ar /opt/llvm-21.1.8/bin/ar
+          ln -s /opt/llvm-21.1.8/bin/llvm-nm /opt/llvm-21.1.8/bin/nm
+          
+          # Add the LLVM bin directory to the front of $GITHUB_PATH so all steps use it
+          echo "/opt/llvm-21.1.8/bin" >> $GITHUB_PATH
 
       - name: Log tool versions
         run: |
           echo git
           git --version
           echo "##########################"
-          # echo wasmer
-          # wasmer -V
-          # echo "##########################"
           echo clang
           clang -v
           echo "##########################"
@@ -50,6 +64,9 @@ jobs:
           echo llvm-nm
           llvm-nm -V
           echo "##########################"
+          echo nm
+          nm -V
+          echo "##########################"
           echo nodejs
           node -v
           echo "##########################"
@@ -57,7 +74,7 @@ jobs:
           npm -v
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -65,17 +82,9 @@ jobs:
         run: |
           git config --global --add safe.directory $(pwd)
           rm -rf /opt/wasix-sysroot
-          mkdir /opt/wasix-sysroot
+          mkdir -p /opt/wasix-sysroot
           ./build32${{ matrix.variant }}.sh
           cp -r sysroot32${{ matrix.variant }} /opt/wasix-sysroot/sysroot
-
-      # - name: Run WASIX tests
-      #   run: |
-      #     export CLANG_VERSION=$(clang --version | grep -i "clang version" | sed -n 's/.*version \([0-9.]*\).*/\1/p')
-      #     echo Detected clang version $CLANG_VERSION
-      #     mkdir -p /usr/lib/clang/19/lib/wasm32-wasmer-wasi
-      #     cp /opt/wasix-sysroot/lib/wasm32-wasi/libclang_rt.builtins-wasm32.a /usr/lib/clang/19/lib/wasm32-wasmer-wasi/libclang_rt.builtins.a
-      #     TOOLCHAIN=/opt/wasix-sysroot/clang-wasix.cmake_toolchain ./test/wasix/run_tests.sh
 
       - name: Upload sysroot
         uses: actions/upload-artifact@v4

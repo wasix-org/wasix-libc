@@ -382,7 +382,7 @@ ASMFLAGS += --target=$(TARGET_TRIPLE)
 # TODO: Add -fno-signaling-nans when the compiler supports it.
 CFLAGS += -fno-trapping-math
 # Add all warnings, but disable a few which occur in third-party code.
-CFLAGS += -Wall -Wextra -Werror -Wno-error=deprecated \
+CFLAGS += -Wall -Wextra -Werror \
   -Wno-incompatible-function-pointer-types \
   -Wno-null-pointer-arithmetic \
   -Wno-unused-parameter \

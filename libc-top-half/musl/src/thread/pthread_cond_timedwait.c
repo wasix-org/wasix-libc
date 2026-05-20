@@ -1,37 +1,7 @@
 #include "pthread_impl.h"
 
-#ifdef WASIX_LIBC_DEBUG_PTHREAD_MUTEX
-#include <stdio.h>
-#endif
-
 #ifndef __wasilibc_unmodified_upstream
 #include <common/clock.h>
-#endif
-
-#ifdef WASIX_LIBC_DEBUG_PTHREAD_MUTEX
-#ifdef __wasilibc_unmodified_upstream
-#define WASILIBC_UNMODIFIED_UPSTREAM_DEFINED 1
-#else
-#define WASILIBC_UNMODIFIED_UPSTREAM_DEFINED 0
-#endif
-
-static void debug_cond_mutex_error(const char *branch, pthread_mutex_t *m, int err)
-{
-	pthread_t self = __pthread_self();
-
-	fprintf(stderr,
-		"wasix-libc pthread_cond_timedwait mutex error: "
-		"branch=%s err=%d m=%p m_type=%d m_lock=%d m_waiters=%d "
-		"self_tid=%d __wasilibc_unmodified_upstream=%d\n",
-		branch, err, (void *)m, m->_m_type, m->_m_lock, m->_m_waiters,
-		self ? self->tid : -1,
-		WASILIBC_UNMODIFIED_UPSTREAM_DEFINED);
-}
-
-#define DEBUG_COND_MUTEX_ERROR(branch, m, err) \
-	debug_cond_mutex_error((branch), (m), (err))
-#else
-#define DEBUG_COND_MUTEX_ERROR(branch, m, err) ((void)0)
 #endif
 
 /*
@@ -108,10 +78,8 @@ int __pthread_cond_timedwait(pthread_cond_t *restrict c, pthread_mutex_t *restri
 #endif
 	volatile int *fut;
 
-	if ((m->_m_type&15) && (m->_m_lock&INT_MAX) != __pthread_self()->tid) {
-		DEBUG_COND_MUTEX_ERROR("entry-owner-check", m, EPERM);
+	if ((m->_m_type&15) && (m->_m_lock&INT_MAX) != __pthread_self()->tid)
 		return EPERM;
-	}
 
 	if (ts && ts->tv_nsec >= 1000000000UL)
 		return EINVAL;
@@ -187,10 +155,7 @@ relock:
 	/* Errors locking the mutex override any existing error or
 	 * cancellation, since the caller must see them to know the
 	 * state of the mutex. */
-	if ((tmp = pthread_mutex_lock(m))) {
-		DEBUG_COND_MUTEX_ERROR("relock", m, tmp);
-		e = tmp;
-	}
+	if ((tmp = pthread_mutex_lock(m))) e = tmp;
 
 	if (oldstate == WAITING) goto done;
 

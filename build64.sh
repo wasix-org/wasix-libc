@@ -2,6 +2,16 @@
 
 set -Eeuxo pipefail
 
+sed_in_place() {
+    local expr="$1"
+    local file="$2"
+    local tmp
+
+    tmp="$(mktemp "${file}.XXXXXX")"
+    sed "$expr" "$file" > "$tmp"
+    mv "$tmp" "$file"
+}
+
 export TARGET_ARCH=wasm64
 export TARGET_OS=wasix
 cd tools/wasix-headers/WASI
@@ -12,8 +22,8 @@ cd ../../..
 # Build the extensions
 cargo run --manifest-path tools/wasix-headers/Cargo.toml generate-libc --64bit
 cp -f libc-bottom-half/headers/public/wasi/api.h libc-bottom-half/headers/public/wasi/api_wasix.h
-sed -i 's|__wasi__|__wasix__|g' libc-bottom-half/headers/public/wasi/api_wasix.h
-sed -i 's|__wasi_api_h|__wasix_api_h|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+sed_in_place 's|__wasi__|__wasix__|g' libc-bottom-half/headers/public/wasi/api_wasix.h
+sed_in_place 's|__wasi_api_h|__wasix_api_h|g' libc-bottom-half/headers/public/wasi/api_wasix.h
 cp -f libc-bottom-half/sources/__wasilibc_real.c libc-bottom-half/sources/__wasixlibc_real.c
 
 # Build WASI
@@ -21,8 +31,8 @@ mkdir -p build/temp
 rsync -rtvu --delete tools/wasix-headers/ build/temp
 cp -r -f tools/wasi-headers/WASI/phases/* build/temp/WASI/phases
 mv -f build/temp/WASI/phases/snapshot/witx/wasi_snapshot_preview1.witx build/temp/WASI/phases/snapshot/witx/wasix_v1.witx
-sed -i 's|(field $buf_len $size)|(field $buf_len usize)|g' build/temp/WASI/phases/snapshot/witx/typenames.witx
-sed -i 's|(param $buf_len $size)|(param $buf_len usize)|g' build/temp/WASI/phases/snapshot/witx/wasix_v1.witx
+sed_in_place 's|(field $buf_len $size)|(field $buf_len usize)|g' build/temp/WASI/phases/snapshot/witx/typenames.witx
+sed_in_place 's|(param $buf_len $size)|(param $buf_len usize)|g' build/temp/WASI/phases/snapshot/witx/wasix_v1.witx
 cargo clean --manifest-path build/temp/Cargo.toml
 cargo run --manifest-path build/temp/Cargo.toml generate-libc --64bit
 cp -f libc-bottom-half/headers/public/wasi/api.h libc-bottom-half/headers/public/wasi/api_wasi.h

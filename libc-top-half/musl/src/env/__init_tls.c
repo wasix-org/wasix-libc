@@ -109,10 +109,10 @@ int __init_tp(void *p)
 	 * - __tl_lock and __lockfile uses TID 0 as "unlocked".
 	 * - __lockfile relies on the fact the most significant two bits
 	 *   of TIDs are 0.
-	 * - pthread mutex owner tracking reserves 0x3fffffff as the
+	 * - pthread mutex owner tracking reserves 0x3dadbeef as the
 	 *   "not recoverable" sentinel.
 	 */
-	td->tid = 0x20000000;
+	td->tid = 0x3fffffff;
 
 	if (&__stack_high) {
 		td->stack = &__stack_high;

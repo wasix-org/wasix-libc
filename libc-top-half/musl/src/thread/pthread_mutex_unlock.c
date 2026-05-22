@@ -19,7 +19,7 @@ int __pthread_mutex_unlock(pthread_mutex_t *m)
 		if ((type&3) == PTHREAD_MUTEX_RECURSIVE && m->_m_count)
 			return m->_m_count--, 0;
 		if ((type&4) && (old&0x40000000))
-			new = 0x7dadbeef;
+			new = 0x7ffffffe;
 		if (!priv) {
 			self->robust_list.pending = &m->_m_next;
 #ifdef __wasilibc_unmodified_upstream

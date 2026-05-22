@@ -21,7 +21,7 @@ int __pthread_mutex_trylock_owner(pthread_mutex_t *m)
 			return 0;
 		}
 	}
-	if (own == 0x3dadbeef) return ENOTRECOVERABLE;
+	if (own == 0x3ffffffe) return ENOTRECOVERABLE;
 	if (own || (old && !(type & 4))) return EBUSY;
 
 	if (type & 128) {

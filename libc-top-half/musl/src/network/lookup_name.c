@@ -116,7 +116,7 @@ static int name_from_dns_search(struct address buf[static MAXADDRS], char canon[
   __wasi_addr_ip_t *addrs;
   int rv = 0;
 
-  addrs = calloc((MAXADDRS + 1), sizeof(__wasi_addr_t));
+  addrs = calloc((MAXADDRS + 1), sizeof(__wasi_addr_ip_t));
   if (!addrs) {
     rv = EAI_MEMORY;
     goto done;
@@ -129,13 +129,34 @@ static int name_from_dns_search(struct address buf[static MAXADDRS], char canon[
     goto cleanup;
   }
 
-  for (int i = 0; (i < (int) naddrs) && (i < MAXADDRS); i++) {
-    buf[i] = (struct address){
-      .family = addrs[i].tag,
+  for (int i = 0; (i < (int) naddrs) && (rv < MAXADDRS); i++) {
+    int addr_family;
+    const void *addr_src;
+    size_t addr_len;
+
+    switch (addrs[i].tag) {
+    case __WASI_ADDRESS_FAMILY_IP_INET4:
+      addr_family = AF_INET;
+      addr_src = &addrs[i].u.inet4;
+      addr_len = 4;
+      break;
+    case __WASI_ADDRESS_FAMILY_IP_INET6:
+      addr_family = AF_INET6;
+      addr_src = &addrs[i].u.inet6;
+      addr_len = 16;
+      break;
+    default:
+      continue;
+    }
+    if (family != AF_UNSPEC && family != addr_family)
+      continue;
+
+    buf[rv] = (struct address){
+      .family = addr_family,
       .scopeid = 0,
       .sortkey = 0,
     };
-    memcpy(buf[i].addr, &addrs[i].u, 16);
+    memcpy(buf[rv].addr, addr_src, addr_len);
     rv++;
   }
 
@@ -360,6 +381,16 @@ int __lookup_name(struct address buf[static MAXADDRS], char canon[static 256], c
 		if (!cnt) cnt = name_from_dns_search(buf, canon, name, family);
 	}
 	if (cnt<=0) return cnt ? cnt : EAI_NONAME;
+
+	/* Honor the requested address family for all lookup backends. */
+	if (family == AF_INET || family == AF_INET6) {
+		for (i=j=0; i<cnt; i++) {
+			if (buf[i].family == family)
+				buf[j++] = buf[i];
+		}
+		cnt = j;
+		if (!cnt) return EAI_NONAME;
+	}
 
 	/* Filter/transform results for v4-mapped lookup, if requested. */
 	if (flags & AI_V4MAPPED) {

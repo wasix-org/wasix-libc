@@ -29,9 +29,7 @@ int setitimer(int which, const struct itimerval *restrict new, struct itimerval 
 	}
 	return syscall(SYS_setitimer, which, new, old);
 #else
-	__wasi_timestamp_t ts = (new->it_interval.tv_sec * (time_t)1000000000) + (new->it_interval.tv_usec * 1000);
-
-	int ret = __wasi_proc_raise_interval((__wasi_signal_t)__WASI_SIGNAL_ALRM, ts, __WASI_BOOL_TRUE);
+	int ret = __wasi_proc_raise_interval2((__wasi_signal_t)__WASI_SIGNAL_ALRM, (const __wasi_itimerval_t *) new, (__wasi_itimerval_t *)old);
 	if (ret != 0) {
 		errno = ret;
 		return -1;

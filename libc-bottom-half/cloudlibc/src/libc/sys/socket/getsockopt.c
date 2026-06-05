@@ -46,7 +46,14 @@ int getsockopt(int socket, int level, int option_name,
       return 0;
     }
     case SO_ERROR: {
-      int value = 0;
+      __wasi_filesize_t fs;
+      __wasi_errno_t error = __wasi_sock_get_opt_size(socket, option_name, &fs);
+      if (error != 0) {
+        errno = error;
+        return -1;
+      }
+
+      int value = fs;
       memcpy(option_value, &value, *option_len < sizeof(int) ? *option_len : sizeof(int));
       *option_len = sizeof(int);
       return 0;

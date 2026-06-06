@@ -77,6 +77,7 @@ static inline int wasi_to_sockaddr(const struct __wasi_addr_port_t *restrict pee
       addrun.sun_family = AF_UNIX;
       memcpy(&addrun.sun_path, &peer_addr->u.unix.b0, sizeof(addrun.sun_path));
       addrun.sun_path[sizeof(addrun.sun_path) - 1] = '\0'; // make sure the address is null-terminated
+      memcpy(addr, &addrun, MIN(sizeof(struct sockaddr_un), *addrlen));
       *addrlen = offsetof(struct sockaddr_un, sun_path) + strlen(addrun.sun_path);
     } else {
       addr->sa_family = AF_UNSPEC;
@@ -109,8 +110,18 @@ static inline int sockaddr_to_wasi(const struct sockaddr *restrict addr, const s
     struct sockaddr_un *addrun = (struct sockaddr_un *)addr;
     peer_addr->tag = __WASI_ADDRESS_FAMILY_UNIX;
     socklen_t pathlen = addrlen - offsetof(struct sockaddr_un, sun_path);
-    if (pathlen > 107) { // Addresses are limited to 107 bytes + 1 null byte only
-      return -1;
+    if (pathlen > sizeof(addrun->sun_path)) {
+      pathlen = sizeof(addrun->sun_path);
+    }
+    if (addrun->sun_path[0] != '\0') {
+      void *nul = memchr(addrun->sun_path, '\0', pathlen);
+      if (nul != NULL) {
+        pathlen = (char *)nul - addrun->sun_path;
+      } else if (pathlen >= sizeof(addrun->sun_path)) { // Leave room for the null byte.
+        return -1;
+      }
+    } else if (pathlen >= sizeof(addrun->sun_path)) {
+      pathlen = sizeof(addrun->sun_path) - 1;
     }
     memcpy(&peer_addr->u.unix.b0, &addrun->sun_path, (size_t)pathlen);
     *(uint8_t *)(&peer_addr->u.unix.b0 + pathlen) = '\0';

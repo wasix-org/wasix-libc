@@ -34,12 +34,11 @@ int setsockopt(int socket, int level, int option_name, const void *restrict opti
     case SO_MCASTLOOPV6:
     case SO_KEEPALIVE: {
       __wasi_bool_t on = 0;
-      if (option_len >= sizeof(int)) {
-		 on = *((int*)&option_value) > 0 ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE;
-	  } else {
-		errno = EINVAL;
-    	return -1;
-	  }
+      if (option_value == NULL || option_len < sizeof(int)) {
+        errno = EINVAL;
+        return -1;
+      }
+      on = (*(const int *)option_value) != 0 ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE;
 
       __wasi_errno_t error = __wasi_sock_set_opt_flag(socket, option_name, on);
       if (error != 0) {

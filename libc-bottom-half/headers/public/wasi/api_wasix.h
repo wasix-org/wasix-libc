@@ -3732,6 +3732,9 @@ _Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflags) == 48, "witx calcula
 _Static_assert(offsetof(__wasi_proc_spawn_fd_op_t, fdflagsext) == 50, "witx calculated offset");
 
 /**
+ * Array of null-terminated C strings passed as a pointer array.
+ */
+/**
  * A handle to a dynamically-loaded library.
  */
 typedef uint32_t __wasi_dl_handle_t;
@@ -4299,6 +4302,42 @@ __wasi_errno_t __wasi_proc_exec3(
     const char *path
 ) __attribute__((__warn_unused_result__));
 /**
+ * Like `proc_exec3`, but `args` and `envs` are proper pointer arrays of
+ * null-terminated strings (each env entry is `KEY=value`).
+ * @return
+ * If the named process does not exist an error will be returned.
+ */
+__wasi_errno_t __wasi_proc_exec4(
+    /**
+     * Name of the process to be spawned
+     */
+    const char *name,
+    /**
+     * List of arguments (null-terminated strings)
+     */
+    const uint8_t * *args,
+    /**
+     * The length of the array pointed to by `args`.
+     */
+    size_t args_len,
+    /**
+     * List of environment variables as `KEY=value` strings (null to inherit)
+     */
+    const uint8_t * *envs,
+    /**
+     * The length of the array pointed to by `envs`.
+     */
+    size_t envs_len,
+    /**
+     * Whether to search for the file in PATH.
+     */
+    __wasi_bool_t search_path,
+    /**
+     * The current value of the PATH env var.
+     */
+    const char *path
+) __attribute__((__warn_unused_result__));
+/**
  * Spawns a new process within the context of the parent process
  * (i.e. this process). It inherits the filesystem and sandbox
  * permissions but runs standalone.
@@ -4365,6 +4404,61 @@ __wasi_errno_t __wasi_proc_spawn2(
      * (entries are separated by line feeds)
      */
     const char *envs,
+    /**
+     * List of FD operations to perform before
+     * spawning the new process.
+     */
+    const __wasi_proc_spawn_fd_op_t *fd_ops,
+    /**
+     * The length of the array pointed to by `fd_ops`.
+     */
+    size_t fd_ops_len,
+    /**
+     * List of signal dispositions to override
+     * for the new process.
+     */
+    const __wasi_signal_disposition_t *signal_dispositions,
+    /**
+     * The length of the array pointed to by `signal_dispositions`.
+     */
+    size_t signal_dispositions_len,
+    /**
+     * Whether to search for the file in PATH.
+     */
+    __wasi_bool_t search_path,
+    /**
+     * The current value of the PATH env var.
+     */
+    const char *path,
+    __wasi_pid_t *retptr0
+) __attribute__((__warn_unused_result__));
+/**
+ * Like `proc_spawn2`, but `args` and `envs` are proper pointer arrays of
+ * null-terminated strings (each env entry is `KEY=value`).
+ * @return
+ * If the named process does not exist an error will be returned.
+ */
+__wasi_errno_t __wasi_proc_spawn3(
+    /**
+     * Name of the process to be spawned
+     */
+    const char *name,
+    /**
+     * List of arguments (null-terminated strings)
+     */
+    const uint8_t * *args,
+    /**
+     * The length of the array pointed to by `args`.
+     */
+    size_t args_len,
+    /**
+     * List of environment variables as `KEY=value` strings (null to inherit)
+     */
+    const uint8_t * *envs,
+    /**
+     * The length of the array pointed to by `envs`.
+     */
+    size_t envs_len,
     /**
      * List of FD operations to perform before
      * spawning the new process.

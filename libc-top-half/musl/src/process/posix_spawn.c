@@ -298,7 +298,7 @@ fail:
 	return ec;
 }
 #else
-char *__wasilibc_exec_combine_strings(char *const strings[]);
+size_t __wasilibc_count_strings(char *const strings[]);
 
 int __posix_spawn(pid_t *restrict res, const char *restrict path,
 				  const posix_spawn_file_actions_t *fa,
@@ -440,16 +440,31 @@ int __posix_spawn(pid_t *restrict res, const char *restrict path,
 		}
 	}
 
-	char *combined_argv = __wasilibc_exec_combine_strings(argv);
-	char *combined_env = __wasilibc_exec_combine_strings(envp);
+	size_t argc = __wasilibc_count_strings(argv);
+	size_t envc = __wasilibc_count_strings(envp);
+	const char *path_env = "";
+
+	if (use_path) {
+		path_env = getenv("PATH");
+		if (!path_env)
+			path_env = "/usr/local/bin:/bin:/usr/bin";
+	}
 
 	__wasi_pid_t ret_pid;
-	int err = __wasi_proc_spawn2(
-		path, combined_argv, combined_env, fdops, nfdops, signals, nsignals,
-		use_path ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE, getenv("PATH"), &ret_pid);
+	int err = __wasi_proc_spawn3(
+		path,
+		(const uint8_t **)argv,
+		argc,
+		envp ? (const uint8_t **)envp : NULL,
+		envc,
+		fdops,
+		nfdops,
+		signals,
+		nsignals,
+		use_path ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE,
+		path_env,
+		&ret_pid);
 
-	free(combined_argv);
-	free(combined_env);
 	free(signals);
 	if (fdops)
 		free(fdops);

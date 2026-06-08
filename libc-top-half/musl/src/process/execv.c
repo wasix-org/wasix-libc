@@ -9,27 +9,23 @@ extern char **__environ;
 #include <wasi/api.h>
 #endif
 
+size_t __wasilibc_count_strings(char *const strings[]);
+
 int execv(const char *path, char *const argv[])
 {
 #ifdef __wasilibc_unmodified_upstream
 	return execve(path, argv, __environ);
 #else
-	int combined_len = 0;
-	for (char **argvp = (char **)argv; *argvp != NULL; argvp++) {
-		combined_len += strlen(*argvp) + 1;
-	}
+	size_t argc = __wasilibc_count_strings(argv);
 
-	char *combined_argv = malloc((combined_len + 1));
-	char *combined_argv_p = combined_argv;
-	for (char **argvp = (char **)argv; *argvp != NULL; argvp++) {
-		memcpy(combined_argv_p, *argvp, strlen(*argvp));
-		combined_argv_p += strlen(*argvp);
-		*combined_argv_p = '\n';
-		combined_argv_p++;
-	}
-	*combined_argv_p = 0;
-	
-	int e = __wasi_proc_exec3(path, combined_argv, NULL, 0, NULL);
+	int e = __wasi_proc_exec4(
+		path,
+		(const uint8_t **)argv,
+		argc,
+		NULL,
+		0,
+		__WASI_BOOL_FALSE,
+		"");
 #ifdef __wasm_exception_handling__
 	extern _Noreturn void __vfork_restore();
 	if (e == 0) {

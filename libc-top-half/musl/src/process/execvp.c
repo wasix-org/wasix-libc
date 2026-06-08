@@ -62,45 +62,42 @@ int __execvpe(const char *file, char *const argv[], char *const envp[])
 	return -1;
 }
 #else
-char *__wasilibc_exec_combine_strings(char *const strings[])
+size_t __wasilibc_count_strings(char *const strings[])
 {
-	int combined_len = 0;
-	for (char **ptr = (char **)strings; *ptr != NULL; ptr++)
-	{
-		combined_len += strlen(*ptr) + 1;
-	}
-
-	char *combined = malloc((combined_len + 1));
-	char *combined_p = combined;
-	for (char **ptr = (char **)strings; *ptr != NULL; ptr++)
-	{
-		memcpy(combined_p, *ptr, strlen(*ptr));
-		combined_p += strlen(*ptr);
-		*combined_p = '\n';
-		combined_p++;
-	}
-	*combined_p = 0;
-
-	return combined;
+	size_t count = 0;
+	if (!strings)
+		return 0;
+	while (strings[count])
+		count++;
+	return count;
 }
 
 int __execvpe(const char *path, char *const argv[], char *const envp[], uint8_t use_path)
 {
-	char *combined_argv = __wasilibc_exec_combine_strings(argv);
-	char *combined_env = __wasilibc_exec_combine_strings(envp);
+	size_t argc = __wasilibc_count_strings(argv);
+	size_t envc = __wasilibc_count_strings(envp);
+	const char *path_env = "";
 
-	int e = __wasi_proc_exec3(
-		path, combined_argv, combined_env,
-		use_path ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE, getenv("PATH"));
+	if (use_path) {
+		path_env = getenv("PATH");
+		if (!path_env)
+			path_env = "/usr/local/bin:/bin:/usr/bin";
+	}
+
+	int e = __wasi_proc_exec4(
+		path,
+		(const uint8_t **)argv,
+		argc,
+		envp ? (const uint8_t **)envp : NULL,
+		envc,
+		use_path ? __WASI_BOOL_TRUE : __WASI_BOOL_FALSE,
+		path_env);
 #ifdef __wasm_exception_handling__
 	extern _Noreturn void __vfork_restore();
 	if (e == 0) {
 		__vfork_restore();
 	}
 #endif
-
-	free(combined_argv);
-	free(combined_env);
 
 	// A return from proc_exec automatically means it failed
 	errno = e;

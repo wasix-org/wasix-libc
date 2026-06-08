@@ -452,6 +452,7 @@ __wasi_port_unbridge
 __wasi_proc_exec
 __wasi_proc_exec2
 __wasi_proc_exec3
+__wasi_proc_exec4
 __wasi_proc_exit
 __wasi_proc_exit2
 __wasi_proc_fork
@@ -467,6 +468,7 @@ __wasi_proc_signals_sizes_get
 __wasi_proc_snapshot
 __wasi_proc_spawn
 __wasi_proc_spawn2
+__wasi_proc_spawn3
 __wasi_random_get
 __wasi_reflect_signature
 __wasi_resolve
@@ -511,6 +513,7 @@ __wasi_thread_start_C
 __wasi_tty_get
 __wasi_tty_set
 __wasilibc_access
+__wasilibc_count_strings
 __wasilibc_cwd
 __wasilibc_cwd_lock
 __wasilibc_cwd_unlock
@@ -519,7 +522,6 @@ __wasilibc_dttoif
 __wasilibc_ensure_environ
 __wasilibc_environ
 __wasilibc_environ_init
-__wasilibc_exec_combine_strings
 __wasilibc_fd_renumber
 __wasilibc_find_abspath
 __wasilibc_find_relpath

@@ -81,6 +81,23 @@ static void reverse_hosts(char *buf, const unsigned char *a, unsigned scopeid, i
 	__fclose_ca(f);
 }
 
+static void reverse_loopback(char *buf, const unsigned char *a, unsigned scopeid, int family)
+{
+	static const unsigned char loopback4[4] = { 127, 0, 0, 1 };
+	static const unsigned char loopback6[16] = { [15] = 1 };
+
+	switch (family) {
+	case AF_INET:
+		if (!memcmp(a, loopback4, sizeof loopback4))
+			strcpy(buf, "localhost");
+		break;
+	case AF_INET6:
+		if (!scopeid && !memcmp(a, loopback6, sizeof loopback6))
+			strcpy(buf, "localhost");
+		break;
+	}
+}
+
 static void reverse_services(char *buf, int port, int dgram)
 {
 	unsigned long svport;
@@ -152,6 +169,7 @@ int getnameinfo(const struct sockaddr *restrict sa, socklen_t sl,
 		buf[0] = 0;
 		if (!(flags & NI_NUMERICHOST)) {
 			reverse_hosts(buf, a, scopeid, af);
+			if (!*buf) reverse_loopback(buf, a, scopeid, af);
 		}
 #ifdef __wasi_unmodified_upstream
 		if (!*buf && !(flags & NI_NUMERICHOST)) {

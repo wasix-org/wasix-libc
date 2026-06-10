@@ -220,6 +220,12 @@
 #define CMPLX(x,y) __CMPLX(x, y, double)
 #define CMPLXF(x,y) __CMPLX(x, y, float)
 #define CMPLXL(x,y) __CMPLX(x, y, long double)
+#define CMSG_ALIGN(len) (((len) + sizeof (size_t) - 1) & (size_t) ~(sizeof (size_t) - 1))
+#define CMSG_DATA(cmsg) ((unsigned char *) (((struct cmsghdr *)(cmsg)) + 1))
+#define CMSG_FIRSTHDR(mhdr) ((size_t) (mhdr)->msg_controllen >= sizeof (struct cmsghdr) ? (struct cmsghdr *) (mhdr)->msg_control : (struct cmsghdr *) 0)
+#define CMSG_LEN(len) (CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
+#define CMSG_NXTHDR(mhdr,cmsg) ((cmsg)->cmsg_len < sizeof (struct cmsghdr) || __CMSG_LEN(cmsg) + sizeof(struct cmsghdr) >= __MHDR_END(mhdr) - (unsigned char *)(cmsg) ? 0 : (struct cmsghdr *)__CMSG_NEXT(cmsg))
+#define CMSG_SPACE(len) (CMSG_ALIGN (len) + CMSG_ALIGN (sizeof (struct cmsghdr)))
 #define CMSPAR 010000000000
 #define CODESET 14
 #define COLL_WEIGHTS_MAX 2
@@ -4148,6 +4154,8 @@
 #define SCHED_OTHER 0
 #define SCHED_RESET_ON_FORK 0x40000000
 #define SCHED_RR 2
+#define SCM_CREDENTIALS 0x02
+#define SCM_RIGHTS 0x01
 #define SCNd16 __INT16_FMTd__
 #define SCNd32 __INT32_FMTd__
 #define SCNd64 __INT64_FMTd__
@@ -5474,6 +5482,8 @@
 #define __compiler_ATOMIC_WCHAR_T_LOCK_FREE 2
 #define __CLANG_MAX_ALIGN_T_DEFINED 
 #define __CMPLX(x,y,t) (__builtin_complex((t)(x), (t)(y)))
+#define __CMSG_LEN(cmsg) (((cmsg)->cmsg_len + sizeof(long) - 1) & ~(long)(sizeof(long) - 1))
+#define __CMSG_NEXT(cmsg) ((unsigned char *)(cmsg) + __CMSG_LEN(cmsg))
 #define __CONSTANT_CFSTRINGS__ 1
 #define __CPU_op_S(i,size,set,op) ( (i)/8U >= (size) ? 0 : (((unsigned long *)(set))[(i)/8/sizeof(long)] op (1UL<<((i)%(8*sizeof(long))))) )
 #define __CPU_op_func_S(func,op) static __inline void __CPU_##func##_S(size_t __size, cpu_set_t *__dest, const cpu_set_t *__src1, const cpu_set_t *__src2) { size_t __i; for (__i=0; __i<__size/sizeof(long); __i++) ((unsigned long *)__dest)[__i] = ((unsigned long *)__src1)[__i] op ((unsigned long *)__src2)[__i] ; }
@@ -5707,6 +5717,7 @@
 #define __MEMORY_SCOPE_SYSTEM 0
 #define __MEMORY_SCOPE_WRKGRP 2
 #define __MEMORY_SCOPE_WVFRNT 3
+#define __MHDR_END(mhdr) ((unsigned char *)(mhdr)->msg_control + (mhdr)->msg_controllen)
 #define __NAMESER 19991006
 #define __NEED_FILE 
 #define __NEED___isoc_va_list 
@@ -6202,6 +6213,8 @@
 #define __WASI_SIGNAL_WINCH (UINT8_C(28))
 #define __WASI_SIGNAL_XCPU (UINT8_C(24))
 #define __WASI_SIGNAL_XFSZ (UINT8_C(25))
+#define __WASI_SOCK_CMSG_LEVEL_SOCKET (UINT16_C(0))
+#define __WASI_SOCK_CMSG_TYPE_RIGHTS (UINT16_C(0))
 #define __WASI_SOCK_OPTION_ACCEPT_TIMEOUT (UINT8_C(22))
 #define __WASI_SOCK_OPTION_BROADCAST (UINT8_C(6))
 #define __WASI_SOCK_OPTION_CONNECT_TIMEOUT (UINT8_C(21))

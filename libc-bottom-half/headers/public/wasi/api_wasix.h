@@ -1424,6 +1424,9 @@ typedef uint16_t __wasi_sock_cmsg_level_t;
  */
 #define __WASI_SOCK_CMSG_LEVEL_SOCKET (UINT16_C(0))
 
+_Static_assert(sizeof(__wasi_sock_cmsg_level_t) == 2, "witx calculated size");
+_Static_assert(_Alignof(__wasi_sock_cmsg_level_t) == 2, "witx calculated align");
+
 /**
  * Socket control message type.
  */
@@ -1433,6 +1436,9 @@ typedef uint16_t __wasi_sock_cmsg_type_t;
  * POSIX SCM_RIGHTS. Payload is an array of file descriptors.
  */
 #define __WASI_SOCK_CMSG_TYPE_RIGHTS (UINT16_C(0))
+
+_Static_assert(sizeof(__wasi_sock_cmsg_type_t) == 2, "witx calculated size");
+_Static_assert(_Alignof(__wasi_sock_cmsg_type_t) == 2, "witx calculated align");
 
 /**
  * Socket control message header.
@@ -1444,14 +1450,17 @@ typedef struct __wasi_sock_cmsg_t {
      * Header plus payload size in bytes.
      */
     __wasi_size_t cmsg_len;
+
     /**
      * Control message level.
      */
     __wasi_sock_cmsg_level_t cmsg_level;
+
     /**
      * Control message type.
      */
     __wasi_sock_cmsg_type_t cmsg_type;
+
 } __wasi_sock_cmsg_t;
 
 _Static_assert(sizeof(__wasi_sock_cmsg_t) == 8, "witx calculated size");
@@ -5036,11 +5045,11 @@ __wasi_errno_t __wasi_sock_recv_msg(
     /**
      * Output control-message buffer.
      */
-    uint8_t *ro_control,
+    uint8_t * ro_control,
     /**
      * Capacity of ro_control in bytes.
      */
-    size_t ro_control_len,
+    __wasi_size_t ro_control_len,
     __wasi_size_t *retptr0,
     __wasi_roflags_t *retptr1,
     __wasi_size_t *retptr2
@@ -5075,11 +5084,11 @@ __wasi_errno_t __wasi_sock_send_msg(
     /**
      * Input control-message buffer.
      */
-    const uint8_t *si_control,
+    const uint8_t * si_control,
     /**
      * Size of si_control in bytes.
      */
-    size_t si_control_len,
+    __wasi_size_t si_control_len,
     __wasi_size_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**

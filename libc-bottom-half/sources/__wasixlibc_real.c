@@ -1053,13 +1053,13 @@ __wasi_errno_t __wasi_sock_recv_msg(
     size_t ri_data_len,
     __wasi_riflags_t ri_flags,
     __wasi_addr_port_t * addr,
-    uint8_t *ro_control,
-    size_t ro_control_len,
+    uint8_t * ro_control,
+    __wasi_size_t ro_control_len,
     __wasi_size_t *retptr0,
     __wasi_roflags_t *retptr1,
     __wasi_size_t *retptr2
 ){
-    int32_t ret = __imported_wasix_32v1_sock_recv_msg((int32_t) fd, (intptr_t) ri_data, (intptr_t) ri_data_len, ri_flags, (intptr_t) addr, (intptr_t) ro_control, (intptr_t) ro_control_len, (intptr_t) retptr0, (intptr_t) retptr1, (intptr_t) retptr2);
+    int32_t ret = __imported_wasix_32v1_sock_recv_msg((int32_t) fd, (intptr_t) ri_data, (intptr_t) ri_data_len, ri_flags, (int32_t) addr, (int32_t) ro_control, (int32_t) ro_control_len, (intptr_t) retptr0, (intptr_t) retptr1, (intptr_t) retptr2);
     return (uint16_t) ret;
 }
 
@@ -1074,11 +1074,11 @@ __wasi_errno_t __wasi_sock_send_msg(
     size_t si_data_len,
     __wasi_siflags_t si_flags,
     const __wasi_addr_port_t * addr,
-    const uint8_t *si_control,
-    size_t si_control_len,
+    const uint8_t * si_control,
+    __wasi_size_t si_control_len,
     __wasi_size_t *retptr0
 ){
-    int32_t ret = __imported_wasix_32v1_sock_send_msg((int32_t) fd, (intptr_t) si_data, (intptr_t) si_data_len, si_flags, (intptr_t) addr, (intptr_t) si_control, (intptr_t) si_control_len, (intptr_t) retptr0);
+    int32_t ret = __imported_wasix_32v1_sock_send_msg((int32_t) fd, (intptr_t) si_data, (intptr_t) si_data_len, si_flags, (int32_t) addr, (int32_t) si_control, (int32_t) si_control_len, (intptr_t) retptr0);
     return (uint16_t) ret;
 }
 
@@ -1318,3 +1318,4 @@ __wasi_errno_t __wasi_context_destroy(
     int32_t ret = __imported_wasix_32v1_context_destroy((int64_t) context);
     return (uint16_t) ret;
 }
+

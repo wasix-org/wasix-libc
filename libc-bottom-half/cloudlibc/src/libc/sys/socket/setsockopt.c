@@ -34,7 +34,7 @@ int setsockopt(int socket, int level, int option_name, const void *restrict opti
     case SO_MCASTLOOPV6:
     case SO_KEEPALIVE: {
       __wasi_bool_t on = 0;
-      if (option_value == NULL || option_len < sizeof(int)) {
+      if (option_len < sizeof(int)) {
         errno = EINVAL;
         return -1;
       }

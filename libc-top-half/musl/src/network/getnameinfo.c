@@ -85,8 +85,7 @@ static void reverse_loopback(char *buf, const unsigned char *a, unsigned scopeid
 {
     static const unsigned char loopback4[4] = { 127, 0, 0, 1 };
     static const unsigned char loopback6[16] = { [15] = 1 };
-    static const unsigned char v4mapped[12] =
-        "\0\0\0\0\0\0\0\0\0\0\xff\xff";
+    static const unsigned char v4mapped[12] = { [10] = '\xff', [11] = '\xff' };
 
     (void)scopeid;
 

@@ -83,19 +83,25 @@ static void reverse_hosts(char *buf, const unsigned char *a, unsigned scopeid, i
 
 static void reverse_loopback(char *buf, const unsigned char *a, unsigned scopeid, int family)
 {
-	static const unsigned char loopback4[4] = { 127, 0, 0, 1 };
-	static const unsigned char loopback6[16] = { [15] = 1 };
+    static const unsigned char loopback4[4] = { 127, 0, 0, 1 };
+    static const unsigned char loopback6[16] = { [15] = 1 };
+    static const unsigned char v4mapped[12] =
+        "\0\0\0\0\0\0\0\0\0\0\xff\xff";
 
-	switch (family) {
-	case AF_INET:
-		if (!memcmp(a, loopback4, sizeof loopback4))
-			strcpy(buf, "localhost");
-		break;
-	case AF_INET6:
-		if (!scopeid && !memcmp(a, loopback6, sizeof loopback6))
-			strcpy(buf, "localhost");
-		break;
-	}
+    (void)scopeid;
+
+    switch (family) {
+    case AF_INET:
+        if (!memcmp(a, loopback4, sizeof loopback4))
+            strcpy(buf, "localhost");
+        break;
+    case AF_INET6:
+        if (!memcmp(a, loopback6, sizeof loopback6) ||
+            (!memcmp(a, v4mapped, sizeof v4mapped) &&
+             !memcmp(a + 12, loopback4, sizeof loopback4)))
+            strcpy(buf, "localhost");
+        break;
+    }
 }
 
 static void reverse_services(char *buf, int port, int dgram)

@@ -50,6 +50,13 @@ sysroot_output="sysroot$NAME"
 export TARGET_ARCH=wasm32
 export TARGET_OS=wasix
 
+# Map the two absolute paths that leak into compiler-rt/libcxx debug info to
+# fixed tokens, so the archives are byte-reproducible across build dirs and LLVM
+# installs: the tree root (sources + cmake build dirs) and clang's resource dir
+# (builtin headers libc++ pulls in, e.g. /usr/lib/llvm21 vs a Nix store path).
+CLANG_RESOURCE_DIR="$(${CC:-clang} -print-resource-dir)"
+PREFIX_MAP_FLAGS="-ffile-prefix-map=$REPO_ROOT=. -ffile-prefix-map=$CLANG_RESOURCE_DIR=/clang"
+
 sed_in_place() {
     local expr="$1"
     local file="$2"
@@ -80,6 +87,9 @@ compiler_rt() {
         -DCMAKE_SYSTEM_VERSION=1 \
         -DCMAKE_SYSTEM_PROCESSOR=wasm32 \
         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_C_FLAGS="$PREFIX_MAP_FLAGS" \
+        -DCMAKE_CXX_FLAGS="$PREFIX_MAP_FLAGS" \
+        -DCMAKE_ASM_FLAGS="$PREFIX_MAP_FLAGS" \
         -DCMAKE_C_COMPILER_WORKS=ON \
         -DCMAKE_CXX_COMPILER_WORKS=ON \
         -DCMAKE_C_LINKER_DEPFILE_SUPPORTED=OFF \
@@ -190,6 +200,9 @@ libcxx() {
     cmake \
         -DCMAKE_POSITION_INDEPENDENT_CODE="$PIC" \
         -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN" \
+        -DCMAKE_C_FLAGS="$PREFIX_MAP_FLAGS" \
+        -DCMAKE_CXX_FLAGS="$PREFIX_MAP_FLAGS" \
+        -DCMAKE_ASM_FLAGS="$PREFIX_MAP_FLAGS" \
         -DCMAKE_SYSROOT="$REPO_ROOT"/$libcxx_build_sysroot \
         -DCMAKE_INSTALL_PREFIX="$REPO_ROOT"/$libcxx_output \
         -DLIBCXX_ENABLE_THREADS:BOOL=ON \

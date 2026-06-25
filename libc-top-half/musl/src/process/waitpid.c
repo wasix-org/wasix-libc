@@ -45,6 +45,8 @@ pid_t waitpid(pid_t pid, int *status, int options)
 
 		// Build the status code depending on what happened
 		if (code.tag == __WASI_JOIN_STATUS_TYPE_NOTHING) {
+			if ((options & WNOHANG) != 0)
+				return 0;
 			*status = 0;
 		} else if (code.tag == __WASI_JOIN_STATUS_TYPE_EXIT_NORMAL) {
 			*status = W_EXITCODE(code.u.exit_normal, 0);

@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <errno.h>
+#include "syscall.h"
 
 #ifndef __wasilibc_unmodified_upstream
 extern int __wasilibc_pgrp;
@@ -10,7 +11,6 @@ pid_t setpgrp(void)
 #ifdef __wasilibc_unmodified_upstream
 	return setpgid(0, 0);
 #else
-  errno = ENOSYS;
-  return __wasilibc_pgrp;
+	return __syscall_ret(-ENOSYS);
 #endif
 }

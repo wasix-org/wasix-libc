@@ -1,8 +1,6 @@
 #include <signal.h>
 #include <errno.h>
-#ifdef __wasilibc_unmodified_upstream
 #include "syscall.h"
-#endif
 
 int sigaltstack(const stack_t *restrict ss, stack_t *restrict old)
 {
@@ -19,6 +17,6 @@ int sigaltstack(const stack_t *restrict ss, stack_t *restrict old)
 	}
 	return syscall(SYS_sigaltstack, ss, old);
 #else
-	return EINVAL;
+	return __syscall_ret(-EINVAL);
 #endif
 }

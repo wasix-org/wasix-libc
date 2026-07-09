@@ -1,5 +1,8 @@
 #ifndef __wasilibc_unmodified_upstream
 #include <setjmp.h>
+#include <signal.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #  ifdef __wasm_exception_handling__
 /*
@@ -93,9 +96,31 @@ int setjmp (jmp_buf buf) {
 
 #  endif
 
-// TODO: ignoring signal masking for now
-int sigsetjmp(jmp_buf  buf, int savesigs) {
-    return setjmp(buf);
+int sigsetjmp(jmp_buf buf, int savesigs) {
+#if defined(__wasm_exception_handling__)
+	(void)savesigs;
+	return setjmp(buf);
+#else
+	int ret = setjmp(buf);
+	if (ret == 0) {
+		__wasi_stack_snapshot_t *snapshot = buf;
+		if (savesigs) {
+			sigset_t *mask = malloc(sizeof(sigset_t));
+			if (mask && sigprocmask(SIG_SETMASK, NULL, mask) == 0) {
+				if (snapshot->user != 0) {
+					free((void *)(uintptr_t)snapshot->user);
+				}
+				snapshot->user = (uint64_t)(uintptr_t)mask;
+			} else if (mask) {
+				free(mask);
+			}
+		} else if (snapshot->user != 0) {
+			free((void *)(uintptr_t)snapshot->user);
+			snapshot->user = 0;
+		}
+	}
+	return ret;
+#endif
 }
 
 #endif

@@ -5,6 +5,7 @@ TESTS=
 STATUS=0
 FAILED_TESTS=""
 PASSED_TESTS=""
+SYSROOT=${WASIX_SYSROOT_PIC:-${WASIX_SYSROOT:-/opt/wasix-sysroot}}
 
 if [ ! -z "${@:1}" ]; then
     TESTS=${@:1}
@@ -15,7 +16,7 @@ fi
 for test in $TESTS; do
     mkdir -p ${BUILD_DIR}/${test}
     cd ${BUILD_DIR}/${test}
-    cmake --fresh -DCMAKE_MAKE_PROGRAM=make -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN -DCMAKE_SYSROOT=/opt/wasix-sysroot $SCRIPT_DIR/${test}
+    cmake --fresh -DCMAKE_MAKE_PROGRAM=make -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN -DCMAKE_SYSROOT=$SYSROOT $SCRIPT_DIR/${test}
     cmake --build . --target all
     bash $SCRIPT_DIR/${test}/test.sh
     RESULT=$?

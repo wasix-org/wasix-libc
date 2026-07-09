@@ -21,6 +21,26 @@ int pthread_sigmask(int how, const sigset_t *restrict set, sigset_t *restrict ol
 #else
 int pthread_sigmask(int how, const sigset_t *restrict set, sigset_t *restrict old)
 {
+	static __thread sigset_t sigmask;
+
+	if (set && (unsigned)how - SIG_BLOCK > 2U) return EINVAL;
+	if (old) *old = sigmask;
+
+	if (set) {
+		size_t n = sizeof(sigmask.__bits) / sizeof(sigmask.__bits[0]);
+		switch (how) {
+		case SIG_BLOCK:
+			for (size_t i = 0; i < n; i++) sigmask.__bits[i] |= set->__bits[i];
+			break;
+		case SIG_UNBLOCK:
+			for (size_t i = 0; i < n; i++) sigmask.__bits[i] &= ~set->__bits[i];
+			break;
+		case SIG_SETMASK:
+			for (size_t i = 0; i < n; i++) sigmask.__bits[i] = set->__bits[i];
+			break;
+		}
+	}
+
 	return 0;
 }
 #endif

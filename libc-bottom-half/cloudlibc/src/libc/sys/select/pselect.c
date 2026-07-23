@@ -18,12 +18,13 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
     return -1;
   }
 
-  // This implementation does not support polling for exceptional
-  // conditions, such as out-of-band data on TCP sockets.
-  if (errorfds != NULL && errorfds->__nfds > 0) {
-    errno = ENOSYS;
-    return -1;
-  }
+  // wasix poll_oneoff has no exceptional-condition (POLLPRI) event type, so we
+  // cannot report out-of-band data. Rather than fail the whole call with ENOSYS
+  // (which breaks defensive callers like rsync that always pass an exceptfds
+  // set and only treat EBADF as fatal, so ENOSYS spins their select loop),
+  // ignore exceptfds and report that no descriptor is exceptional.
+  if (errorfds != NULL)
+    FD_ZERO(errorfds);
 
   // Replace NULL pointers by the empty set.
   fd_set empty;

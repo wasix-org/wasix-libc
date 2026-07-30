@@ -188,7 +188,31 @@ void __wasm_signal(int sig) {
 	UNLOCK(__eintr_handler_lock);
 
 	if (ksa.handler != 0) {
-		ksa.handler(sig);
+		if (ksa.flags & SA_SIGINFO) {
+			/* A handler installed through `sa_sigaction` takes three
+			 * arguments. On wasm the argument count is part of the
+			 * function type, so calling it through the one-argument
+			 * `sa_handler` signature traps with "indirect call type
+			 * mismatch" instead of silently ignoring the extra
+			 * arguments the way native ABIs do. Dispatch through a
+			 * matching signature instead.
+			 *
+			 * The signal is delivered by the host rather than raised
+			 * from a faulting instruction, so there is no machine
+			 * context to hand over; `ucontext` is null and `siginfo_t`
+			 * carries just the fields the host can attest to. */
+			union {
+				void (*plain)(int);
+				void (*with_info)(int, siginfo_t *, void *);
+			} dispatch = { .plain = ksa.handler };
+			siginfo_t si;
+			memset(&si, 0, sizeof si);
+			si.si_signo = sig;
+			si.si_code = SI_USER;
+			dispatch.with_info(sig, &si, NULL);
+		} else {
+			ksa.handler(sig);
+		}
 	} else {
 		unsigned long set[_NSIG/(8*sizeof(long))];
 		__block_all_sigs(&set);

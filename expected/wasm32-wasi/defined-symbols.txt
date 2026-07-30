@@ -282,6 +282,8 @@ __set_thread_area
 __shgetc
 __shlim
 __shm_mapname
+__sig_deliver_pending
+__sig_register_callback
 __sigaction
 __sigaction_external_default
 __signgam

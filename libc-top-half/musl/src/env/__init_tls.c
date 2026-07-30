@@ -123,6 +123,14 @@ int __init_tp(void *p)
 	td->robust_list.head = &td->robust_list.head;
 	td->sysinfo = __sysinfo;
 	td->next = td->prev = td;
+#ifndef __wasilibc_unmodified_upstream
+	/* __wasi_init_tp() allocates this structure with aligned_alloc(), which
+	 * does not zero, so every field the signal code reads has to be set here
+	 * explicitly. Leaving the mask as heap garbage makes arbitrary signals
+	 * look blocked. */
+	memset(&td->sigmask, 0, sizeof td->sigmask);
+	memset(&td->sigpending, 0, sizeof td->sigpending);
+#endif
 	return 0;
 }
 

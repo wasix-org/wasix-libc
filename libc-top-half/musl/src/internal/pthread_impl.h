@@ -4,6 +4,11 @@
 #include <pthread.h>
 #ifdef __wasilibc_unmodified_upstream
 #include <signal.h>
+#else
+/* The signal mask below needs sigset_t as a complete type. Pulling in all of
+ * <signal.h> here would be circular, so take just the typedef. */
+#define __NEED_sigset_t
+#include <bits/alltypes.h>
 #endif
 #include <errno.h>
 #include <limits.h>
@@ -67,6 +72,14 @@ struct pthread {
 	volatile int killlock[1];
 	char *dlerror_buf;
 	void *stdio_locks;
+#ifndef __wasilibc_unmodified_upstream
+	/* Signals are masked in the guest: WASIX has no kernel to hold a
+	 * per-thread mask for us. `sigpending` holds deliveries that arrived
+	 * while blocked, which __sig_deliver_pending() flushes on unblock.
+	 * Only ever touched by the owning thread, so no lock is needed. */
+	sigset_t sigmask;
+	sigset_t sigpending;
+#endif
 
 	/* Part 3 -- the positions of these fields relative to
 	 * the end of the structure is external and internal ABI. */

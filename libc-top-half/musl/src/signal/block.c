@@ -5,10 +5,9 @@
 #include <wasi/api.h>
 #endif
 #include <signal.h>
-
 #ifdef __wasilibc_unmodified_upstream
 #else
-extern volatile int __eintr_handler_lock[1];
+#include "sigmask.h"
 #endif
 
 static const unsigned long all_mask[] = {
@@ -42,8 +41,9 @@ void __block_all_sigs(void *set)
 #ifdef __wasilibc_unmodified_upstream
 	__syscall(SYS_rt_sigprocmask, SIG_BLOCK, &all_mask, set, _NSIG/8);
 #else
-	a_store(__eintr_handler_lock, 1);
-	__wasi_callback_signal("__wasm_signal_blocked");
+	pthread_t self = __pthread_self();
+	if (set) __sigset_copy((sigset_t *)set, &self->sigmask);
+	__sigset_or(&self->sigmask, all_mask);
 #endif
 }
 
@@ -52,8 +52,9 @@ void __block_app_sigs(void *set)
 #ifdef __wasilibc_unmodified_upstream
 	__syscall(SYS_rt_sigprocmask, SIG_BLOCK, &app_mask, set, _NSIG/8);
 #else
-	a_store(__eintr_handler_lock, 1);
-	__wasi_callback_signal("__wasm_signal_blocked");
+	pthread_t self = __pthread_self();
+	if (set) __sigset_copy((sigset_t *)set, &self->sigmask);
+	__sigset_or(&self->sigmask, app_mask);
 #endif
 }
 
@@ -62,6 +63,10 @@ void __restore_sigs(void *set)
 #ifdef __wasilibc_unmodified_upstream
 	__syscall(SYS_rt_sigprocmask, SIG_SETMASK, set, 0, _NSIG/8);
 #else
-	__wasi_callback_signal("__wasm_signal");
+	pthread_t self = __pthread_self();
+	if (set) __sigset_copy(&self->sigmask, (const sigset_t *)set);
+	/* Restoring can unblock, and nothing else will come along to deliver:
+	 * WASIX only delivers signals at syscall boundaries. */
+	__sig_deliver_pending();
 #endif
 }

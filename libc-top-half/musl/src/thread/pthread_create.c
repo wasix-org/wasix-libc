@@ -516,6 +516,13 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 	new->robust_list.head = &new->robust_list.head;
 	new->canary = self->canary;
 	new->sysinfo = self->sysinfo;
+#ifndef __wasilibc_unmodified_upstream
+	/* POSIX: a new thread inherits the creator's signal mask and starts with
+	 * nothing pending. Upstream gets this from clone(); the mask lives in the
+	 * thread structure here, so copy it across explicitly. */
+	new->sigmask = self->sigmask;
+	memset(&new->sigpending, 0, sizeof new->sigpending);
+#endif
 
 	/* Setup argument structure for the new thread on its stack.
 	 * It's safe to access from the caller only until the thread

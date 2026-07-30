@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <signal.h>
+#include <string.h>
 #include "syscall.h"
 #ifdef __wasilibc_unmodified_upstream
 #else
@@ -56,6 +57,15 @@ pid_t _Fork(int copy_mem)
 		__thread_list_lock = 0;
 		libc.threads_minus_1 = 0;
 		if (libc.need_locks) libc.need_locks = -1;
+#ifndef __wasilibc_unmodified_upstream
+		/* The child is a fresh instance as far as the host is concerned, so
+		 * it has no signal callback registered even though the guest-side
+		 * bookkeeping was inherited and claims otherwise. Without this the
+		 * host discards every signal sent to the child. */
+		__sig_register_callback();
+		/* POSIX: the child's set of pending signals starts out empty. */
+		memset(&self->sigpending, 0, sizeof self->sigpending);
+#endif
 	}
 	UNLOCK(__abort_lock);
 	__aio_atfork(!ret);

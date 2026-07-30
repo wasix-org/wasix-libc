@@ -185,6 +185,15 @@ void __wasm_signal(int sig) {
 	}
 	LOCK(__eintr_handler_lock);
 	struct k_sigaction ksa = __eintr_handler_callbacks[sig];
+	if (ksa.handler != 0 && (ksa.flags & SA_RESETHAND)) {
+		/* POSIX resets the disposition to SIG_DFL on entry to a handler
+		 * installed with SA_RESETHAND, so a signal re-raised from inside
+		 * the handler takes the default action instead of re-entering the
+		 * handler and recursing until the stack is exhausted. */
+		struct k_sigaction reset;
+		memset(&reset, 0, sizeof reset);
+		__eintr_handler_callbacks[sig] = reset;
+	}
 	UNLOCK(__eintr_handler_lock);
 
 	if (ksa.handler != 0) {

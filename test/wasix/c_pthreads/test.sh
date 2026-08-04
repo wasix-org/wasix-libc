@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 tmpfile=$(mktemp)
 wasmer run --verbose --enable-all ./main > $tmpfile

@@ -1,4 +1,4 @@
-#/bin/bash -e
+#!/usr/bin/env bash -e
 cp -f sysroot/share/wasm32-wasi/defined-symbols.txt expected/wasm32-wasi/defined-symbols.txt
 cp -f sysroot/share/wasm32-wasi/include-all.c expected/wasm32-wasi/include-all.c
 cp -f sysroot/share/wasm32-wasi/predefined-macros.txt expected/wasm32-wasi/predefined-macros.txt

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 wasmer run --verbose --enable-all ./main
 RESULT=$?

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # check-eh-type.sh - Detect whether a WebAssembly sysroot uses legacy or new exception handling
 #

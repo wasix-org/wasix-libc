@@ -13,8 +13,8 @@ uint16_t htons(uint16_t);
 uint32_t ntohl(uint32_t);
 uint16_t ntohs(uint16_t);
 
-#ifdef __wasilibc_unmodified_upstream /* WASI has no inet_addr */
 in_addr_t inet_addr (const char *);
+#ifdef __wasilibc_unmodified_upstream /* WASI has no inet_network */
 in_addr_t inet_network (const char *);
 #endif
 char *inet_ntoa (struct in_addr);

@@ -1421,6 +1421,12 @@ typedef uint16_t __wasi_siflags_t;
 #define __WASI_SIFLAGS_SEND_DONT_WAIT ((__wasi_siflags_t)+(1 << 0))
 
 /**
+ * Send out-of-band (urgent) data. Only meaningful for stream sockets whose
+ * transport supports it (e.g. TCP).
+ */
+#define __WASI_SIFLAGS_SEND_OOB ((__wasi_siflags_t)+(1 << 1))
+
+/**
 *** Hidden type
 typedef uint8_t __wasi_sdflags_t;
 

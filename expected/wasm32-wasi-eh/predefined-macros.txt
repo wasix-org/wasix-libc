@@ -6172,6 +6172,7 @@
 #define __WASI_SDFLAGS_RD ((__wasi_sdflags_t)+(1 << 0))
 #define __WASI_SDFLAGS_WR ((__wasi_sdflags_t)+(1 << 1))
 #define __WASI_SIFLAGS_SEND_DONT_WAIT ((__wasi_siflags_t)+(1 << 0))
+#define __WASI_SIFLAGS_SEND_OOB ((__wasi_siflags_t)+(1 << 1))
 #define __WASI_SIGNAL_ABRT (UINT8_C(6))
 #define __WASI_SIGNAL_ALRM (UINT8_C(14))
 #define __WASI_SIGNAL_BUS (UINT8_C(7))

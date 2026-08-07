@@ -4,6 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * WASIX extension to the preview1 event type namespace. Indicates that a file
+ * descriptor has an exceptional condition pending, such as TCP urgent data.
+ */
+#define __WASI_EVENTTYPE_FD_EXCEPT (UINT8_C(3))
+
 #ifdef _REENTRANT
 /**
  * Request a new thread to be created by the host.

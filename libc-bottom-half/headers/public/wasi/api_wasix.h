@@ -766,6 +766,12 @@ typedef uint16_t __wasi_riflags_t;
 #define __WASI_RIFLAGS_RECV_DONT_WAIT ((__wasi_riflags_t)+(1 << 3))
 
 /**
+ * Receive out-of-band (urgent) data. Only meaningful for stream sockets
+ * whose transport supports it (e.g. TCP).
+ */
+#define __WASI_RIFLAGS_RECV_OOB ((__wasi_riflags_t)+(1 << 4))
+
+/**
  * Signal condition.
  */
 typedef uint8_t __wasi_signal_t;

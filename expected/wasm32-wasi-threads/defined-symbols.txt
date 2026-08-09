@@ -456,9 +456,11 @@ __wasi_sock_leave_multicast_v6
 __wasi_sock_listen
 __wasi_sock_open
 __wasi_sock_recv
+__wasi_sock_recv_msg
 __wasi_sock_recv_from
 __wasi_sock_send
 __wasi_sock_send_file
+__wasi_sock_send_msg
 __wasi_sock_send_to
 __wasi_sock_set_opt_flag
 __wasi_sock_set_opt_size

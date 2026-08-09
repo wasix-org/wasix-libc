@@ -1415,6 +1415,61 @@ typedef uint16_t __wasi_siflags_t;
 #define __WASI_SIFLAGS_SEND_DONT_WAIT ((__wasi_siflags_t)+(1 << 0))
 
 /**
+ * Socket control message level.
+ */
+typedef uint16_t __wasi_sock_cmsg_level_t;
+
+/**
+ * POSIX SOL_SOCKET.
+ */
+#define __WASI_SOCK_CMSG_LEVEL_SOCKET (UINT16_C(0))
+
+_Static_assert(sizeof(__wasi_sock_cmsg_level_t) == 2, "witx calculated size");
+_Static_assert(_Alignof(__wasi_sock_cmsg_level_t) == 2, "witx calculated align");
+
+/**
+ * Socket control message type.
+ */
+typedef uint16_t __wasi_sock_cmsg_type_t;
+
+/**
+ * POSIX SCM_RIGHTS. Payload is an array of file descriptors.
+ */
+#define __WASI_SOCK_CMSG_TYPE_RIGHTS (UINT16_C(0))
+
+_Static_assert(sizeof(__wasi_sock_cmsg_type_t) == 2, "witx calculated size");
+_Static_assert(_Alignof(__wasi_sock_cmsg_type_t) == 2, "witx calculated align");
+
+/**
+ * Socket control message header.
+ * 
+ * Payload bytes immediately follow this header in the control buffer.
+ */
+typedef struct __wasi_sock_cmsg_t {
+    /**
+     * Header plus payload size in bytes.
+     */
+    __wasi_size_t cmsg_len;
+
+    /**
+     * Control message level.
+     */
+    __wasi_sock_cmsg_level_t cmsg_level;
+
+    /**
+     * Control message type.
+     */
+    __wasi_sock_cmsg_type_t cmsg_type;
+
+} __wasi_sock_cmsg_t;
+
+_Static_assert(sizeof(__wasi_sock_cmsg_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_sock_cmsg_t) == 4, "witx calculated align");
+_Static_assert(offsetof(__wasi_sock_cmsg_t, cmsg_len) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_sock_cmsg_t, cmsg_level) == 4, "witx calculated offset");
+_Static_assert(offsetof(__wasi_sock_cmsg_t, cmsg_type) == 6, "witx calculated offset");
+
+/**
 *** Hidden type
 typedef uint8_t __wasi_sdflags_t;
 
@@ -5051,6 +5106,83 @@ __wasi_errno_t __wasi_sock_send_to(
      * Address of the socket to send message to
      */
     const __wasi_addr_port_t * addr,
+    __wasi_size_t *retptr0
+) __attribute__((__warn_unused_result__));
+/**
+ * Receive a message, optional peer address, and optional ancillary data from
+ * a socket.
+ * 
+ * Note: This is similar to `recvmsg` in POSIX, though it also supports
+ * reading the data into multiple buffers in the manner of `readv`.
+ * @return
+ * Number of bytes stored in ri_data, message flags, and number of bytes
+ * stored in ro_control.
+ */
+__wasi_errno_t __wasi_sock_recv_msg(
+    __wasi_fd_t fd,
+    /**
+     * List of scatter/gather vectors to which to store data.
+     */
+    const __wasi_iovec_t *ri_data,
+    /**
+     * The length of the array pointed to by `ri_data`.
+     */
+    size_t ri_data_len,
+    /**
+     * Message flags.
+     */
+    __wasi_riflags_t ri_flags,
+    /**
+     * Optional output peer address. Null means the caller does not request it.
+     */
+    __wasi_addr_port_t * addr,
+    /**
+     * Output control-message buffer.
+     */
+    uint8_t * ro_control,
+    /**
+     * Capacity of ro_control in bytes.
+     */
+    __wasi_size_t ro_control_len,
+    __wasi_size_t *retptr0,
+    __wasi_roflags_t *retptr1,
+    __wasi_size_t *retptr2
+) __attribute__((__warn_unused_result__));
+/**
+ * Send a message, optional peer address, and optional ancillary data on a
+ * socket.
+ * 
+ * Note: This is similar to `sendmsg` in POSIX, though it also supports
+ * writing the data from multiple buffers in the manner of `writev`.
+ * @return
+ * Number of bytes transmitted.
+ */
+__wasi_errno_t __wasi_sock_send_msg(
+    __wasi_fd_t fd,
+    /**
+     * List of scatter/gather vectors from which to retrieve data.
+     */
+    const __wasi_ciovec_t *si_data,
+    /**
+     * The length of the array pointed to by `si_data`.
+     */
+    size_t si_data_len,
+    /**
+     * Message flags.
+     */
+    __wasi_siflags_t si_flags,
+    /**
+     * Optional peer address. Null means connected socket / no explicit address.
+     */
+    const __wasi_addr_port_t * addr,
+    /**
+     * Input control-message buffer.
+     */
+    const uint8_t * si_control,
+    /**
+     * Size of si_control in bytes.
+     */
+    __wasi_size_t si_control_len,
     __wasi_size_t *retptr0
 ) __attribute__((__warn_unused_result__));
 /**

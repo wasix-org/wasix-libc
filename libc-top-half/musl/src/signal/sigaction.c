@@ -1,5 +1,6 @@
 #include <signal.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
 #include "syscall.h"
@@ -31,8 +32,12 @@ static void core_handler(int sig) {
 
 _Noreturn
 static void terminate_handler(int sig) {
-    fprintf(stderr, "Program recieved termination signal: %s\n", strsignal(sig));
-    abort();
+    /* A terminating signal is not an abort. Calling abort() here raises
+     * SIGABRT while the original signal is still being dispatched, which can
+     * recursively re-enter the default signal path on runtimes that deliver
+     * the nested signal immediately. POSIX termination is silent; report it
+     * through the conventional shell status instead. */
+    _Exit(128 + sig);
 }
 
 _Noreturn

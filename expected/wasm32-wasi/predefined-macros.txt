@@ -2461,7 +2461,7 @@
 #define POLLIN POLLRDNORM
 #define POLLNVAL 0x4000
 #define POLLOUT POLLWRNORM
-#define POLLPRI POLLIN
+#define POLLPRI 0x4
 #define POLLRDNORM 0x1
 #define POLLWRNORM 0x2
 #define POSIX_CLOSE_RESTART 0
@@ -6090,6 +6090,7 @@
 #define __WASI_EVENTFDFLAGS_SEMAPHORE ((__wasi_eventfdflags_t)+(1 << 0))
 #define __WASI_EVENTRWFLAGS_FD_READWRITE_HANGUP ((__wasi_eventrwflags_t)+(1 << 0))
 #define __WASI_EVENTTYPE_CLOCK (UINT8_C(0))
+#define __WASI_EVENTTYPE_FD_EXCEPT (UINT8_C(3))
 #define __WASI_EVENTTYPE_FD_READ (UINT8_C(1))
 #define __WASI_EVENTTYPE_FD_WRITE (UINT8_C(2))
 #define __WASI_FDFLAGSEXT_CLOEXEC ((__wasi_fdflagsext_t)+(1 << 0))
@@ -6133,6 +6134,7 @@
 #define __WASI_PROC_SPAWN_FD_OP_NAME_OPEN (UINT8_C(2))
 #define __WASI_RIFLAGS_RECV_DATA_TRUNCATED ((__wasi_riflags_t)+(1 << 2))
 #define __WASI_RIFLAGS_RECV_DONT_WAIT ((__wasi_riflags_t)+(1 << 3))
+#define __WASI_RIFLAGS_RECV_OOB ((__wasi_riflags_t)+(1 << 4))
 #define __WASI_RIFLAGS_RECV_PEEK ((__wasi_riflags_t)+(1 << 0))
 #define __WASI_RIFLAGS_RECV_WAITALL ((__wasi_riflags_t)+(1 << 1))
 #define __WASI_RIGHTS_FD_ADVISE ((__wasi_rights_t)+(1 << 7))
@@ -6178,6 +6180,7 @@
 #define __WASI_SDFLAGS_RD ((__wasi_sdflags_t)+(1 << 0))
 #define __WASI_SDFLAGS_WR ((__wasi_sdflags_t)+(1 << 1))
 #define __WASI_SIFLAGS_SEND_DONT_WAIT ((__wasi_siflags_t)+(1 << 0))
+#define __WASI_SIFLAGS_SEND_OOB ((__wasi_siflags_t)+(1 << 1))
 #define __WASI_SIGNAL_ABRT (UINT8_C(6))
 #define __WASI_SIGNAL_ALRM (UINT8_C(14))
 #define __WASI_SIGNAL_BUS (UINT8_C(7))

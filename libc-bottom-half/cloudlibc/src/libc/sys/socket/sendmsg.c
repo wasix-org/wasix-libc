@@ -23,6 +23,7 @@ ssize_t sendmsg(int socket, const struct msghdr* msg, int flags) {
   __wasi_errno_t error;
 
   if ((flags & MSG_DONTWAIT) != 0) { si_flags |= __WASI_SIFLAGS_SEND_DONT_WAIT; }
+  if ((flags & MSG_OOB) != 0) { si_flags |= __WASI_SIFLAGS_SEND_OOB; }
 
   if (msg->msg_name == NULL) {
     error = __wasi_sock_send(socket, si_data, si_data_len, si_flags, &so_datalen);

@@ -21,6 +21,7 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags) {
   __wasi_siflags_t si_flags = 0;
 
   if ((flags & MSG_DONTWAIT) != 0) { si_flags |= __WASI_SIFLAGS_SEND_DONT_WAIT; }
+  if ((flags & MSG_OOB) != 0) { si_flags |= __WASI_SIFLAGS_SEND_OOB; }
 
   // Perform system call.
   __wasi_size_t so_datalen;

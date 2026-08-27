@@ -237,15 +237,17 @@ void psignal(int, const char *);
 #if defined(_XOPEN_SOURCE) || defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
 int killpg(pid_t, int);
 #endif
-#ifdef __wasilibc_unmodified_upstream /* WASI has no signals */
 #if defined(_XOPEN_SOURCE) || defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
+#ifdef __wasilibc_unmodified_upstream /* WASI has no alternate signal stack */
 int sigaltstack(const stack_t *__restrict, stack_t *__restrict);
+#endif
 int sighold(int);
 int sigignore(int);
 int siginterrupt(int, int);
 int sigpause(int);
 int sigrelse(int);
 void (*sigset(int, void (*)(int)))(int);
+#ifdef __wasilibc_unmodified_upstream /* WASI has no siginfo or alternate signal stack */
 #define TRAP_BRKPT 1
 #define TRAP_TRACE 2
 #define TRAP_BRANCH 3

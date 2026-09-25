@@ -7,42 +7,19 @@
 #include <string.h>
 
 int setsockopt(int socket, int level, int option_name, const void *restrict option_value, socklen_t option_len) {
-  if (level == IPPROTO_TCP &&
-      (option_name == TCP_KEEPIDLE || option_name == TCP_KEEPINTVL ||
-       option_name == TCP_KEEPCNT)) {
-    if (option_len < sizeof(int)) {
-      errno = EINVAL;
-      return -1;
-    }
-    if (option_value == NULL) {
-      errno = EFAULT;
-      return -1;
-    }
-    int value;
-    memcpy(&value, option_value, sizeof(value));
-    if (value <= 0) {
-      errno = EINVAL;
-      return -1;
-    }
-    __wasi_sock_option_t option = option_name == TCP_KEEPIDLE
-        ? __WASI_SOCK_OPTION_TCP_KEEP_IDLE
-        : option_name == TCP_KEEPINTVL
-        ? __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL
-        : __WASI_SOCK_OPTION_TCP_KEEP_COUNT;
-    __wasi_errno_t error = __wasi_sock_set_opt_size(socket, option, value);
-    if (error != 0) {
-      errno = error;
-      return -1;
-    }
-    return 0;
-  }
   if (level == IPPROTO_IPV6 && option_name == IPV6_V6ONLY) {
     level = SOL_SOCKET;
     option_name = SO_ONLYV6;
   }
-  if (level == IPPROTO_TCP && option_name == TCP_NODELAY) {
+  if (level == IPPROTO_TCP) {
+    switch (option_name) {
+      case TCP_NODELAY: option_name = SO_NODELAY; break;
+      case TCP_KEEPIDLE: option_name = __WASI_SOCK_OPTION_TCP_KEEP_IDLE; break;
+      case TCP_KEEPINTVL: option_name = __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL; break;
+      case TCP_KEEPCNT: option_name = __WASI_SOCK_OPTION_TCP_KEEP_COUNT; break;
+      default: errno = ENOSYS; return -1;
+    }
     level = SOL_SOCKET;
-    option_name = SO_NODELAY;
   }
 
   if(level!=SOL_SOCKET) {
@@ -115,19 +92,24 @@ int setsockopt(int socket, int level, int option_name, const void *restrict opti
       return 0;
     }
     case SO_RCVBUF:
-	case SO_SNDBUF:
-	case SO_TTL:
-	case SO_MCASTTTLV4: {
-	  __wasi_filesize_t fs;
-	  if (option_len >= sizeof(socklen_t)) {
-		socklen_t *len = (socklen_t *)option_value;
-		fs = *len;
-	  } else {
-		errno = EINVAL;
-    	return -1;
-	  }
-      
-      __wasi_errno_t error = __wasi_sock_set_opt_size(socket, option_name, fs);
+    case SO_SNDBUF:
+    case SO_TTL:
+    case SO_MCASTTTLV4:
+    case __WASI_SOCK_OPTION_TCP_KEEP_IDLE:
+    case __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL:
+    case __WASI_SOCK_OPTION_TCP_KEEP_COUNT: {
+      socklen_t value;
+      if (option_len < sizeof(value)) {
+        errno = EINVAL;
+        return -1;
+      }
+      if (option_value == NULL) {
+        errno = EFAULT;
+        return -1;
+      }
+      memcpy(&value, option_value, sizeof(value));
+
+      __wasi_errno_t error = __wasi_sock_set_opt_size(socket, option_name, value);
       if (error != 0) {
         errno = error;
         return -1;

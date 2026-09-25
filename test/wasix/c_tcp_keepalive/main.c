@@ -46,30 +46,30 @@ static void check_validation(int fd) {
   check_options(fd);
 }
 
-static void check_output_lengths(int fd) {
+static void check_output_lengths(int fd, int level, int option, int expected) {
   unsigned char output[sizeof(int) + 1];
   memset(output, 0xa5, sizeof(output));
   socklen_t len = 1;
-  assert(getsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, output, &len) == 0);
+  assert(getsockopt(fd, level, option, output, &len) == 0);
   assert(len == 1);
-  assert(output[0] == ((const unsigned char *)&values[0])[0]);
+  assert(output[0] == ((const unsigned char *)&expected)[0]);
   assert(output[1] == 0xa5);
 
   len = sizeof(output);
-  assert(getsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, output, &len) == 0);
+  assert(getsockopt(fd, level, option, output, &len) == 0);
   assert(len == sizeof(int));
-  assert(memcmp(output, &values[0], sizeof(int)) == 0);
+  assert(memcmp(output, &expected, sizeof(int)) == 0);
   assert(output[sizeof(int)] == 0xa5);
 
   len = 0;
-  assert(getsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, NULL, &len) == 0);
+  assert(getsockopt(fd, level, option, NULL, &len) == 0);
   assert(len == 0);
   len = sizeof(int);
   errno = 0;
-  assert(getsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, NULL, &len) == -1);
+  assert(getsockopt(fd, level, option, NULL, &len) == -1);
   assert(errno == EFAULT);
   errno = 0;
-  assert(getsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, output, NULL) == -1);
+  assert(getsockopt(fd, level, option, output, NULL) == -1);
   assert(errno == EFAULT);
 }
 
@@ -82,7 +82,10 @@ int main(void) {
     assert(setsockopt(fd, IPPROTO_TCP, options[i], &values[i], sizeof(values[i])) == 0);
   check_options(fd);
   check_validation(fd);
-  check_output_lengths(fd);
+  check_output_lengths(fd, IPPROTO_TCP, TCP_KEEPIDLE, values[0]);
+  int buffer_size = 4096;
+  assert(setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &buffer_size, sizeof(buffer_size)) == 0);
+  check_output_lengths(fd, SOL_SOCKET, SO_RCVBUF, buffer_size);
 
   int server = socket(AF_INET, SOCK_STREAM, 0);
   assert(server >= 0);

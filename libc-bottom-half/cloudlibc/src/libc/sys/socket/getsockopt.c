@@ -3,10 +3,40 @@
 
 #include <wasi/api.h>
 #include <errno.h>
+#include <limits.h>
 #include <string.h>
 
 int getsockopt(int socket, int level, int option_name,
                void *restrict option_value, socklen_t *restrict option_len) {
+  if (level == IPPROTO_TCP &&
+      (option_name == TCP_KEEPIDLE || option_name == TCP_KEEPINTVL ||
+       option_name == TCP_KEEPCNT)) {
+    if (option_len == NULL || (*option_len != 0 && option_value == NULL)) {
+      errno = EFAULT;
+      return -1;
+    }
+    __wasi_sock_option_t option = option_name == TCP_KEEPIDLE
+        ? __WASI_SOCK_OPTION_TCP_KEEP_IDLE
+        : option_name == TCP_KEEPINTVL
+        ? __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL
+        : __WASI_SOCK_OPTION_TCP_KEEP_COUNT;
+    __wasi_filesize_t size;
+    __wasi_errno_t error = __wasi_sock_get_opt_size(socket, option, &size);
+    if (error != 0) {
+      errno = error;
+      return -1;
+    }
+    if (size > INT_MAX) {
+      errno = EOVERFLOW;
+      return -1;
+    }
+    int value = size;
+    if (*option_len > sizeof(value))
+      *option_len = sizeof(value);
+    if (*option_len != 0)
+      memcpy(option_value, &value, *option_len);
+    return 0;
+  }
   if (level == IPPROTO_IPV6 && option_name == IPV6_V6ONLY) {
     level = SOL_SOCKET;
     option_name = SO_ONLYV6;

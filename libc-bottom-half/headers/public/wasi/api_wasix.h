@@ -2529,6 +2529,24 @@ typedef uint8_t __wasi_sock_option_t;
  */
 #define __WASI_SOCK_OPTION_PROTO (UINT8_C(26))
 
+/**
+ * TCP idle seconds before sending keepalive probes (positive integer).
+ * Read and written using sock_get_opt_size and sock_set_opt_size.
+ */
+#define __WASI_SOCK_OPTION_TCP_KEEP_IDLE (UINT8_C(27))
+
+/**
+ * TCP seconds between keepalive probes (positive integer).
+ * Read and written using sock_get_opt_size and sock_set_opt_size.
+ */
+#define __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL (UINT8_C(28))
+
+/**
+ * TCP unanswered keepalive probes before closing the connection (positive integer).
+ * Read and written using sock_get_opt_size and sock_set_opt_size.
+ */
+#define __WASI_SOCK_OPTION_TCP_KEEP_COUNT (UINT8_C(29))
+
 _Static_assert(sizeof(__wasi_sock_option_t) == 1, "witx calculated size");
 _Static_assert(_Alignof(__wasi_sock_option_t) == 1, "witx calculated align");
 

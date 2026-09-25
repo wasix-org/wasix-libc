@@ -7,6 +7,35 @@
 #include <string.h>
 
 int setsockopt(int socket, int level, int option_name, const void *restrict option_value, socklen_t option_len) {
+  if (level == IPPROTO_TCP &&
+      (option_name == TCP_KEEPIDLE || option_name == TCP_KEEPINTVL ||
+       option_name == TCP_KEEPCNT)) {
+    if (option_len < sizeof(int)) {
+      errno = EINVAL;
+      return -1;
+    }
+    if (option_value == NULL) {
+      errno = EFAULT;
+      return -1;
+    }
+    int value;
+    memcpy(&value, option_value, sizeof(value));
+    if (value <= 0) {
+      errno = EINVAL;
+      return -1;
+    }
+    __wasi_sock_option_t option = option_name == TCP_KEEPIDLE
+        ? __WASI_SOCK_OPTION_TCP_KEEP_IDLE
+        : option_name == TCP_KEEPINTVL
+        ? __WASI_SOCK_OPTION_TCP_KEEP_INTERVAL
+        : __WASI_SOCK_OPTION_TCP_KEEP_COUNT;
+    __wasi_errno_t error = __wasi_sock_set_opt_size(socket, option, value);
+    if (error != 0) {
+      errno = error;
+      return -1;
+    }
+    return 0;
+  }
   if (level == IPPROTO_IPV6 && option_name == IPV6_V6ONLY) {
     level = SOL_SOCKET;
     option_name = SO_ONLYV6;

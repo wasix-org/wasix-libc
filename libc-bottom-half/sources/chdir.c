@@ -98,8 +98,11 @@ static const char *make_absolute(const char *path) {
     }
 
     
-    static char *make_absolute_buf = NULL;
-    static size_t make_absolute_len = 0;
+    // Thread-local: the buffer is filled with the cwd under the lock, then the
+    // caller's path is appended after the lock is dropped, so a shared buffer
+    // lets a concurrent thread overwrite it mid-join.
+    static __thread char *make_absolute_buf = NULL;
+    static __thread size_t make_absolute_len = 0;
 
     // If this path is absolute, then we return it as-is.
     if (path[0] == '/') {

@@ -38,6 +38,20 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
+	/* A completed child must be waitable even when the status is discarded. */
+	pid_t ignored_status_child;
+	err = posix_spawn(&ignored_status_child, child_argv[0], NULL, NULL, child_argv, environ);
+	if (err) {
+		fprintf(stderr, "second posix_spawn failed: %d\n", err);
+		return 4;
+	}
+	waited = waitpid(ignored_status_child, NULL, 0);
+	if (waited != ignored_status_child) {
+		fprintf(stderr, "null-status wait returned pid=%d, expected pid=%d\n",
+			(int)waited, (int)ignored_status_child);
+		return 5;
+	}
+
 	puts("WAITPID_NONBLOCKING_OK");
 	return 0;
 }

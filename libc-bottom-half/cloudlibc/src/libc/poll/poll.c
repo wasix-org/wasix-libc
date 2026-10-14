@@ -9,7 +9,7 @@
 
 int poll(struct pollfd *fds, size_t nfds, int timeout) {
   // Construct events for poll().
-  size_t maxevents = 2 * nfds + 1;
+  size_t maxevents = 3 * nfds + 1;
   __wasi_subscription_t subscriptions[maxevents];
   size_t nsubscriptions = 0;
   for (size_t i = 0; i < nfds; ++i) {
@@ -35,10 +35,19 @@ int poll(struct pollfd *fds, size_t nfds, int timeout) {
       };
       created_events = true;
     }
+    if ((pollfd->events & POLLPRI) != 0) {
+      __wasi_subscription_t *subscription = &subscriptions[nsubscriptions++];
+      *subscription = (__wasi_subscription_t){
+          .userdata = (uintptr_t)pollfd,
+          .u.tag = __WASI_EVENTTYPE_FD_EXCEPT,
+          .u.u.fd_read.file_descriptor = pollfd->fd,
+      };
+      created_events = true;
+    }
 
     // As entries are decomposed into separate read/write subscriptions,
-    // we cannot detect POLLERR, POLLHUP and POLLNVAL if POLLRDNORM and
-    // POLLWRNORM are not specified. Disallow this for now.
+    // we cannot detect POLLERR, POLLHUP and POLLNVAL if POLLRDNORM,
+    // POLLWRNORM and POLLPRI are not specified. Disallow this for now.
     if (!created_events) {
       errno = ENOSYS;
       return -1;
@@ -91,7 +100,8 @@ int poll(struct pollfd *fds, size_t nfds, int timeout) {
   for (size_t i = 0; i < nevents; ++i) {
     const __wasi_event_t *event = &events[i];
     if (event->type == __WASI_EVENTTYPE_FD_READ ||
-        event->type == __WASI_EVENTTYPE_FD_WRITE) {
+        event->type == __WASI_EVENTTYPE_FD_WRITE ||
+        event->type == __WASI_EVENTTYPE_FD_EXCEPT) {
       struct pollfd *pollfd = (struct pollfd *)(uintptr_t)event->userdata;
       if (event->error == __WASI_ERRNO_BADF) {
         // Invalid file descriptor.
@@ -103,7 +113,7 @@ int poll(struct pollfd *fds, size_t nfds, int timeout) {
         // Another error occurred.
         pollfd->revents |= POLLERR;
       } else {
-        // Data can be read or written.
+        // Data can be read or written, or an exceptional condition is pending.
         if (event->type == __WASI_EVENTTYPE_FD_READ) {
             pollfd->revents |= POLLRDNORM;
             if (event->fd_readwrite.flags & __WASI_EVENTRWFLAGS_FD_READWRITE_HANGUP) {
@@ -114,6 +124,8 @@ int poll(struct pollfd *fds, size_t nfds, int timeout) {
             if (event->fd_readwrite.flags & __WASI_EVENTRWFLAGS_FD_READWRITE_HANGUP) {
               pollfd->revents |= POLLHUP;
             }
+        } else if (event->type == __WASI_EVENTTYPE_FD_EXCEPT) {
+            pollfd->revents |= POLLPRI;
         }
       }
     }

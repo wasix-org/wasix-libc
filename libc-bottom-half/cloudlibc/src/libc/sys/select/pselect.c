@@ -18,13 +18,6 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
     return -1;
   }
 
-  // This implementation does not support polling for exceptional
-  // conditions, such as out-of-band data on TCP sockets.
-  if (errorfds != NULL && errorfds->__nfds > 0) {
-    errno = ENOSYS;
-    return -1;
-  }
-
   // Replace NULL pointers by the empty set.
   fd_set empty;
   FD_ZERO(&empty);
@@ -32,9 +25,11 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
     readfds = &empty;
   if (writefds == NULL)
     writefds = &empty;
+  if (errorfds == NULL)
+    errorfds = &empty;
 
   // Determine the maximum number of events.
-  size_t maxevents = readfds->__nfds + writefds->__nfds + 1;
+  size_t maxevents = readfds->__nfds + writefds->__nfds + errorfds->__nfds + 1;
   __wasi_subscription_t subscriptions[maxevents];
   size_t nsubscriptions = 0;
 
@@ -60,6 +55,19 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
           .userdata = fd,
           .u.tag = __WASI_EVENTTYPE_FD_WRITE,
           .u.u.fd_write.file_descriptor = fd,
+      };
+    }
+  }
+
+  // Convert the errorfds set.
+  for (size_t i = 0; i < errorfds->__nfds; ++i) {
+    int fd = errorfds->__fds[i];
+    if (fd < nfds) {
+      __wasi_subscription_t *subscription = &subscriptions[nsubscriptions++];
+      *subscription = (__wasi_subscription_t){
+          .userdata = fd,
+          .u.tag = __WASI_EVENTTYPE_FD_EXCEPT,
+          .u.u.fd_read.file_descriptor = fd,
       };
     }
   }
@@ -103,7 +111,8 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
   for (size_t i = 0; i < nevents; ++i) {
     const __wasi_event_t *event = &events[i];
     if ((event->type == __WASI_EVENTTYPE_FD_READ ||
-         event->type == __WASI_EVENTTYPE_FD_WRITE) &&
+         event->type == __WASI_EVENTTYPE_FD_WRITE ||
+         event->type == __WASI_EVENTTYPE_FD_EXCEPT) &&
         event->error == __WASI_ERRNO_BADF) {
       errno = EBADF;
       return -1;
@@ -113,13 +122,16 @@ int pselect(int nfds, fd_set *restrict readfds, fd_set *restrict writefds,
   // Clear and set entries in the result sets.
   FD_ZERO(readfds);
   FD_ZERO(writefds);
+  FD_ZERO(errorfds);
   for (size_t i = 0; i < nevents; ++i) {
     const __wasi_event_t *event = &events[i];
     if (event->type == __WASI_EVENTTYPE_FD_READ) {
       readfds->__fds[readfds->__nfds++] = event->userdata;
     } else if (event->type == __WASI_EVENTTYPE_FD_WRITE) {
       writefds->__fds[writefds->__nfds++] = event->userdata;
+    } else if (event->type == __WASI_EVENTTYPE_FD_EXCEPT) {
+      errorfds->__fds[errorfds->__nfds++] = event->userdata;
     }
   }
-  return readfds->__nfds + writefds->__nfds;
+  return readfds->__nfds + writefds->__nfds + errorfds->__nfds;
 }

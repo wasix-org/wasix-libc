@@ -6,6 +6,7 @@
 
 #define POLLRDNORM 0x1
 #define POLLWRNORM 0x2
+#define POLLPRI 0x4
 
 #define POLLIN POLLRDNORM
 #define POLLOUT POLLWRNORM

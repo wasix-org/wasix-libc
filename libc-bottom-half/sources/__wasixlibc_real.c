@@ -1087,6 +1087,46 @@ __wasi_errno_t __wasi_sock_send_to(
     return (uint16_t) ret;
 }
 
+int32_t __imported_wasix_32v1_sock_recv_msg(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7, int32_t arg8, int32_t arg9) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("sock_recv_msg")
+));
+
+__wasi_errno_t __wasi_sock_recv_msg(
+    __wasi_fd_t fd,
+    const __wasi_iovec_t *ri_data,
+    size_t ri_data_len,
+    __wasi_riflags_t ri_flags,
+    __wasi_addr_port_t * addr,
+    uint8_t * ro_control,
+    __wasi_size_t ro_control_len,
+    __wasi_size_t *retptr0,
+    __wasi_roflags_t *retptr1,
+    __wasi_size_t *retptr2
+){
+    int32_t ret = __imported_wasix_32v1_sock_recv_msg((int32_t) fd, (intptr_t) ri_data, (intptr_t) ri_data_len, ri_flags, (int32_t) addr, (int32_t) ro_control, (int32_t) ro_control_len, (intptr_t) retptr0, (intptr_t) retptr1, (intptr_t) retptr2);
+    return (uint16_t) ret;
+}
+
+int32_t __imported_wasix_32v1_sock_send_msg(int32_t arg0, int32_t arg1, int32_t arg2, int32_t arg3, int32_t arg4, int32_t arg5, int32_t arg6, int32_t arg7) __attribute__((
+    __import_module__("wasix_32v1"),
+    __import_name__("sock_send_msg")
+));
+
+__wasi_errno_t __wasi_sock_send_msg(
+    __wasi_fd_t fd,
+    const __wasi_ciovec_t *si_data,
+    size_t si_data_len,
+    __wasi_siflags_t si_flags,
+    const __wasi_addr_port_t * addr,
+    const uint8_t * si_control,
+    __wasi_size_t si_control_len,
+    __wasi_size_t *retptr0
+){
+    int32_t ret = __imported_wasix_32v1_sock_send_msg((int32_t) fd, (intptr_t) si_data, (intptr_t) si_data_len, si_flags, (int32_t) addr, (int32_t) si_control, (int32_t) si_control_len, (intptr_t) retptr0);
+    return (uint16_t) ret;
+}
+
 int32_t __imported_wasix_32v1_sock_send_file(int32_t arg0, int32_t arg1, int64_t arg2, int64_t arg3, int32_t arg4) __attribute__((
     __import_module__("wasix_32v1"),
     __import_name__("sock_send_file")

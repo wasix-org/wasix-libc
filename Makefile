@@ -109,6 +109,7 @@ LIBC_TOP_HALF_MUSL_SOURCES = \
 	misc/realpath.c \
         misc/syslog.c \
         mman/shm_open.c \
+        mman/memfd_create.c \
         errno/strerror.c \
         \
         network/services.c \

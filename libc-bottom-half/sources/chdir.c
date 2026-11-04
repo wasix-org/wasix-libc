@@ -72,7 +72,9 @@ int chdir_legacy(const char *path)
     return 0;
 }
 
-static const char *make_absolute(const char *path) {
+// Absolute inputs are borrowed. Relative inputs use caller-owned temporary storage.
+static const char *make_absolute(const char *path, char **allocated) {
+    *allocated = NULL;
     // if the libc has not synced with the runtime yet, call into the runtime to get the cwd
     if (!__wasilibc_cwd_is_synced) {
         char cwd[256];
@@ -96,11 +98,6 @@ static const char *make_absolute(const char *path) {
             return NULL;
         }
     }
-
-    
-    // Path consumers run after the cwd lock is released.
-    static __thread char *make_absolute_buf = NULL;
-    static __thread size_t make_absolute_len = 0;
 
     // If this path is absolute, then we return it as-is.
     if (path[0] == '/') {
@@ -127,15 +124,12 @@ static const char *make_absolute(const char *path) {
     size_t path_len = path ? strlen(path) : 0;
     int need_slash = __wasilibc_cwd[cwd_len - 1] == '/' ? 0 : 1;
     size_t alloc_len = cwd_len + path_len + 1 + need_slash;
-    if (alloc_len > make_absolute_len) {
-        char *tmp = realloc(make_absolute_buf, alloc_len);
-        if (tmp == NULL) {
-            __wasilibc_cwd_unlock();
-            return NULL;
-        }
-        make_absolute_buf = tmp;
-        make_absolute_len = alloc_len;
+    char *make_absolute_buf = malloc(alloc_len);
+    if (make_absolute_buf == NULL) {
+        __wasilibc_cwd_unlock();
+        return NULL;
     }
+    *allocated = make_absolute_buf;
     strcpy(make_absolute_buf, __wasilibc_cwd);
     __wasilibc_cwd_unlock();
 
@@ -162,7 +156,8 @@ int __wasilibc_find_relpath_alloc(
     int can_realloc
 ) {
     // First, make our path absolute taking the cwd into account.
-    const char *abspath = make_absolute(path);
+    char *allocated;
+    const char *abspath = make_absolute(path, &allocated);
     if (abspath == NULL) {
         errno = ENOMEM;
         return -1;
@@ -174,24 +169,32 @@ int __wasilibc_find_relpath_alloc(
     const char *rel;
     int fd = __wasilibc_find_abspath(abspath, abs_prefix, &rel);
     if (fd == -1)
-        return -1;
+        goto out;
 
     size_t rel_len = strlen(rel);
     if (*relative_buf_len < rel_len + 1) {
         if (!can_realloc) {
             errno = ERANGE;
-            return -1;
+            fd = -1;
+            goto out;
         }
         char *tmp = realloc(*relative_buf, rel_len + 1);
         if (tmp == NULL) {
             errno = ENOMEM;
-            return -1;
+            fd = -1;
+            goto out;
         }
         *relative_buf = tmp;
         *relative_buf_len = rel_len + 1;
     }
     strcpy(*relative_buf, rel);
-    return fd;
+out:
+    {
+        int saved_errno = errno;
+        free(allocated);
+        errno = saved_errno;
+        return fd;
+    }
 }
 
 int chdir(const char *path)

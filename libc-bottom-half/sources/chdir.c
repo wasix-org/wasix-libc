@@ -98,8 +98,9 @@ static const char *make_absolute(const char *path) {
     }
 
     
-    static char *make_absolute_buf = NULL;
-    static size_t make_absolute_len = 0;
+    // Path consumers run after the cwd lock is released.
+    static __thread char *make_absolute_buf = NULL;
+    static __thread size_t make_absolute_len = 0;
 
     // If this path is absolute, then we return it as-is.
     if (path[0] == '/') {
